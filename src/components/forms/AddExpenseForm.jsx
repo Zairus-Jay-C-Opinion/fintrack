@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Input from "../ui/Input";
+import FormSelect from "../ui/FormSelect";
 import Button from "../ui/Button";
 import { format } from "date-fns";
 import { EXPENSE_CATEGORIES } from "../../utils/expenses";
@@ -9,6 +10,8 @@ export default function AddExpenseForm({
   onCancel,
   initialData = null,
   submitLabel = "Add expense",
+  formId = "add-expense-form",
+  hideActions = false,
 }) {
   const [form, setForm] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
@@ -44,7 +47,7 @@ export default function AddExpenseForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <Input
         label="Date"
         type="date"
@@ -59,20 +62,17 @@ export default function AddExpenseForm({
         onChange={(e) => setForm({ ...form, item: e.target.value })}
         required
       />
-      <label className="block text-sm text-text-secondary">
-        Category
-        <select
-          className="mt-1.5 w-full rounded-[var(--radius-sm)] border border-accent bg-bg-deepest px-3 py-2 text-text-primary"
-          value={form.category}
-          onChange={(e) => setForm({ ...form, category: e.target.value })}
-        >
-          {EXPENSE_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FormSelect
+        label="Category"
+        value={form.category}
+        onChange={(e) => setForm({ ...form, category: e.target.value })}
+      >
+        {EXPENSE_CATEGORIES.map((c) => (
+          <option key={c} value={c}>
+            {c}
+          </option>
+        ))}
+      </FormSelect>
       <Input
         label="Amount (PHP)"
         type="number"
@@ -87,14 +87,23 @@ export default function AddExpenseForm({
         value={form.note}
         onChange={(e) => setForm({ ...form, note: e.target.value })}
       />
-      <div className="flex gap-2">
-        <Button type="submit">{submitLabel}</Button>
-        {onCancel && (
-          <Button type="button" variant="ghost" onClick={onCancel}>
-            Cancel
+      {!hideActions && (
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button type="submit" className="w-full sm:w-auto">
+            {submitLabel}
           </Button>
-        )}
-      </div>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full sm:w-auto"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
+      )}
     </form>
   );
 }

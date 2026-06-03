@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Input from "../ui/Input";
+import FormSelect from "../ui/FormSelect";
 import Button from "../ui/Button";
 import { format } from "date-fns";
 import { useSettingsStore } from "../../store/useSettingsStore";
@@ -11,6 +12,8 @@ export default function AddInvestmentForm({
   onCancel,
   initialData = null,
   submitLabel = "Record purchase",
+  formId = "add-investment-form",
+  hideActions = false,
 }) {
   const phpUsdRate = useSettingsStore((s) => s.phpUsdRate);
   const [form, setForm] = useState({
@@ -62,7 +65,7 @@ export default function AddInvestmentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4">
       <Input
         label="Date"
         type="date"
@@ -70,20 +73,17 @@ export default function AddInvestmentForm({
         onChange={(e) => setForm({ ...form, date: e.target.value })}
         required
       />
-      <label className="block text-sm text-text-secondary">
-        Asset type
-        <select
-          className="mt-1.5 w-full rounded-[var(--radius-sm)] border border-accent bg-bg-deepest px-3 py-2 text-text-primary"
-          value={form.assetType}
-          onChange={(e) => setForm({ ...form, assetType: e.target.value })}
-        >
-          {ASSET_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-      </label>
+      <FormSelect
+        label="Asset type"
+        value={form.assetType}
+        onChange={(e) => setForm({ ...form, assetType: e.target.value })}
+      >
+        {ASSET_TYPES.map((t) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
+      </FormSelect>
       <Input
         label="Ticker / symbol"
         placeholder="e.g. VOO, AAPL, TSLA"
@@ -111,7 +111,7 @@ export default function AddInvestmentForm({
         onChange={(e) => setForm({ ...form, priceUSD: e.target.value })}
         required
       />
-      <p className="font-mono text-sm text-text-secondary">
+      <p className="break-words font-mono text-sm text-text-secondary">
         Total: ${totalUSD.toFixed(2)} ≈ ₱{totalPHP.toLocaleString("en-PH")}
       </p>
       <Input
@@ -131,16 +131,23 @@ export default function AddInvestmentForm({
         value={form.note}
         onChange={(e) => setForm({ ...form, note: e.target.value })}
       />
-      <div className="flex gap-2">
-        <Button type="submit" disabled={!ticker}>
-          {submitLabel}
-        </Button>
-        {onCancel && (
-          <Button type="button" variant="ghost" onClick={onCancel}>
-            Cancel
+      {!hideActions && (
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button type="submit" className="w-full sm:w-auto" disabled={!ticker}>
+            {submitLabel}
           </Button>
-        )}
-      </div>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full sm:w-auto"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
+      )}
     </form>
   );
 }

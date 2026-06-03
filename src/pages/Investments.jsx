@@ -98,7 +98,7 @@ export default function Investments() {
   };
 
   return (
-    <div className="min-w-0 max-w-full">
+    <div className="page-shell">
       <TopBar
         title="Investments"
         subtitle={`${userProfile.broker} portfolio`}
@@ -136,7 +136,7 @@ export default function Investments() {
         </p>
       )}
 
-      <div className="mb-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-2 min-w-0 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Total Invested" value={formatUsd(totalInvested)} sub="What you paid" />
         <StatCard
           label="Current Value"
@@ -486,9 +486,33 @@ export default function Investments() {
           setEditingPurchase(null);
         }}
         title={editingPurchase ? "Edit purchase" : "Add purchase"}
+        footer={
+          <div className="flex flex-col gap-2">
+            <Button
+              type="submit"
+              form="add-investment-form"
+              className="w-full"
+            >
+              {editingPurchase ? "Save changes" : "Record purchase"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setModalOpen(false);
+                setEditingPurchase(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        }
       >
         <AddInvestmentForm
           key={editingPurchase?.id ?? "new"}
+          formId="add-investment-form"
+          hideActions
           initialData={editingPurchase}
           submitLabel={editingPurchase ? "Save changes" : "Record purchase"}
           onSubmit={handleSubmit}

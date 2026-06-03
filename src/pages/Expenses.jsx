@@ -88,7 +88,7 @@ export default function Expenses() {
   };
 
   return (
-    <div className="min-w-0 max-w-full overflow-x-hidden">
+    <div className="page-shell">
       <TopBar
         title="Expenses"
         subtitle={`${monthLabel} spending`}
@@ -266,9 +266,29 @@ export default function Expenses() {
           setEditing(null);
         }}
         title={editing ? "Edit expense" : "Log a purchase"}
+        footer={
+          <div className="flex flex-col gap-2">
+            <Button type="submit" form="add-expense-form" className="w-full">
+              {editing ? "Save changes" : "Log purchase"}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setModalOpen(false);
+                setEditing(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        }
       >
         <AddExpenseForm
           key={editing?.id ?? "new"}
+          formId="add-expense-form"
+          hideActions
           initialData={editing}
           submitLabel={editing ? "Save changes" : "Add expense"}
           onSubmit={handleSubmit}

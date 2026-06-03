@@ -5,11 +5,11 @@ export default function PageHelp({ title = "How this page works", children }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 min-w-0 max-w-full">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between gap-2 rounded-[var(--radius-md)] border border-accent bg-bg-deepest px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:border-highlight/50 hover:text-text-primary"
+        className="flex w-full min-w-0 max-w-full items-center justify-between gap-2 rounded-[var(--radius-md)] border border-accent bg-bg-deepest px-4 py-3 text-left text-sm text-text-secondary transition-colors hover:border-highlight/50 hover:text-text-primary"
       >
         <span className="flex items-center gap-2">
           <HelpCircle size={18} className="text-highlight" />

@@ -101,7 +101,7 @@ export default function Goals() {
   };
 
   return (
-    <div className="min-w-0 max-w-full overflow-x-hidden">
+    <div className="page-shell">
       <TopBar
         title="Goals"
         subtitle="Save toward targets"
@@ -166,8 +166,17 @@ export default function Goals() {
         )}
       </div>
 
-      <Modal open={goalModal} onClose={() => setGoalModal(false)} title="New goal">
-        <form onSubmit={handleAddGoal} className="space-y-4">
+      <Modal
+        open={goalModal}
+        onClose={() => setGoalModal(false)}
+        title="New goal"
+        footer={
+          <Button type="submit" form="new-goal-form" className="w-full">
+            Create goal
+          </Button>
+        }
+      >
+        <form id="new-goal-form" onSubmit={handleAddGoal} className="space-y-4">
           <Input
             label="Goal name"
             value={goalForm.name}
@@ -198,11 +207,23 @@ export default function Goals() {
             onChange={(e) => setGoalForm({ ...goalForm, targetDate: e.target.value })}
             required
           />
-          <Button type="submit">Create goal</Button>
         </form>
       </Modal>
 
-      <Modal open={fundModal} onClose={() => setFundModal(false)} title="Fund goals">
+      <Modal
+        open={fundModal}
+        onClose={() => setFundModal(false)}
+        title="Fund goals"
+        footer={
+          <Button
+            className="w-full"
+            onClick={applyFunding}
+            disabled={totalPool <= 0}
+          >
+            Apply to goals
+          </Button>
+        }
+      >
         <div className="space-y-4">
           <p className="text-sm text-text-secondary">
             Money is split equally across {savingsGoals.length} goal(s). Each
@@ -261,9 +282,6 @@ export default function Goals() {
             <p className="text-gain">{formatPhp(preview.applied)}</p>
           </div>
 
-          <Button onClick={applyFunding} disabled={totalPool <= 0}>
-            Apply to goals
-          </Button>
         </div>
       </Modal>
 
@@ -274,8 +292,14 @@ export default function Goals() {
           setEditingGoal(null);
         }}
         title={`Update — ${editingGoal?.name ?? ""}`}
+        footer={
+          <Button type="submit" form="goal-progress-form" className="w-full">
+            Save
+          </Button>
+        }
       >
         <form
+          id="goal-progress-form"
           onSubmit={(e) => {
             e.preventDefault();
             const amount = parseFloat(progressInput);
@@ -296,7 +320,6 @@ export default function Goals() {
             onChange={(e) => setProgressInput(e.target.value)}
             required
           />
-          <Button type="submit">Save</Button>
         </form>
       </Modal>
     </div>

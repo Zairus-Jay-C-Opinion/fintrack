@@ -1,13 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
-function lockBodyScroll(lock) {
-  if (typeof document === "undefined") return;
-  const body = document.body;
-  if (lock) {
+export default function Modal({ open, onClose, title, children, footer }) {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+
     const scrollY = window.scrollY;
+    const html = document.documentElement;
+    const body = document.body;
+
+    html.dataset.modalOpen = "1";
+    body.dataset.modalOpen = "1";
     body.dataset.scrollLockY = String(scrollY);
     body.style.position = "fixed";
     body.style.top = `-${scrollY}px`;
@@ -15,23 +22,28 @@ function lockBodyScroll(lock) {
     body.style.right = "0";
     body.style.width = "100%";
     body.style.overflow = "hidden";
-  } else {
-    const scrollY = Number(body.dataset.scrollLockY || 0);
-    body.style.position = "";
-    body.style.top = "";
-    body.style.left = "";
-    body.style.right = "";
-    body.style.width = "";
-    body.style.overflow = "";
-    delete body.dataset.scrollLockY;
-    window.scrollTo(0, scrollY);
-  }
-}
 
-export default function Modal({ open, onClose, title, children }) {
-  useEffect(() => {
-    lockBodyScroll(open);
-    return () => lockBodyScroll(false);
+    const blockBackgroundTouch = (e) => {
+      if (panelRef.current?.contains(e.target)) return;
+      e.preventDefault();
+    };
+
+    document.addEventListener("touchmove", blockBackgroundTouch, { passive: false });
+
+    return () => {
+      document.removeEventListener("touchmove", blockBackgroundTouch);
+      delete html.dataset.modalOpen;
+      delete body.dataset.modalOpen;
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      body.style.overflow = "";
+      const y = Number(body.dataset.scrollLockY || 0);
+      delete body.dataset.scrollLockY;
+      window.scrollTo(0, y);
+    };
   }, [open]);
 
   if (typeof document === "undefined") return null;
@@ -40,7 +52,7 @@ export default function Modal({ open, onClose, title, children }) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[200] flex items-end justify-center md:items-center md:p-4"
+          className="fixed inset-0 z-[200] flex items-end justify-center p-0 md:items-center md:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -50,13 +62,14 @@ export default function Modal({ open, onClose, title, children }) {
         >
           <button
             type="button"
-            className="absolute inset-0 bg-black/70"
+            className="absolute inset-0 bg-black/75"
             onClick={onClose}
             aria-label="Close dialog"
           />
           <motion.div
-            className="relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-t-2xl border border-accent bg-bg-mid shadow-elevated md:max-h-[min(88dvh,720px)] md:rounded-2xl"
-            style={{ maxHeight: "min(92dvh, 100%)" }}
+            ref={panelRef}
+            className="relative z-10 flex w-[calc(100vw-1rem)] max-w-md flex-col overflow-hidden rounded-t-2xl border border-accent bg-bg-mid shadow-elevated md:w-full md:rounded-2xl"
+            style={{ height: "min(90dvh, 100%)" }}
             initial={{ opacity: 0, y: "100%" }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "100%" }}
@@ -66,7 +79,7 @@ export default function Modal({ open, onClose, title, children }) {
             <div className="flex shrink-0 items-center justify-between border-b border-accent/60 px-4 py-3">
               <h2
                 id="modal-title"
-                className="pr-2 font-display text-lg font-bold text-white"
+                className="min-w-0 flex-1 pr-2 font-display text-lg font-bold text-white"
               >
                 {title}
               </h2>
@@ -79,12 +92,19 @@ export default function Modal({ open, onClose, title, children }) {
                 <X size={22} />
               </button>
             </div>
+
             <div
-              className="overflow-y-auto overscroll-y-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]"
-              style={{ maxHeight: "calc(92dvh - 3.25rem)" }}
+              className="min-h-0 flex-1 overflow-y-scroll overscroll-y-contain px-4 py-3 [-webkit-overflow-scrolling:touch]"
+              style={{ touchAction: "pan-y" }}
             >
-              {children}
+              <div className="min-w-0 max-w-full">{children}</div>
             </div>
+
+            {footer && (
+              <div className="shrink-0 border-t border-accent/60 bg-bg-mid px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                {footer}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
