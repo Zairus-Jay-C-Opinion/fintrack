@@ -24,8 +24,7 @@ import { formatPhp, formatUsd, usdToPhp } from "../utils/currency";
 import { formatDate } from "../utils/formatters";
 import { useExchangeRate } from "../hooks/useExchangeRate";
 import { useMarketChart } from "../contexts/MarketChartContext";
-import { useChartCache } from "../hooks/useChartCache";
-import { resolveChartTicker } from "../utils/chartCache";
+import { resolveChartTicker } from "../utils/marketChart";
 import { userProfile } from "../constants/userProfile";
 
 export default function Investments() {
@@ -51,9 +50,10 @@ export default function Investments() {
     quoteErrors,
     chartErrors,
     priceFallbacks,
+    priceHistory,
+    chartTicker,
     setChartTicker,
   } = useMarketChart();
-  const { priceHistory, chartTicker } = useChartCache();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPurchase, setEditingPurchase] = useState(null);

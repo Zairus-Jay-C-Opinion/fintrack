@@ -1,10 +1,5 @@
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useState } from "react";
 import { useFinanceStore } from "../store/useFinanceStore";
-import {
-  getChartCache,
-  setChartCache,
-  subscribeChartCache,
-} from "../utils/chartCache";
 import {
   fetchMultipleQuotes,
   fetchMultipleCandles,
@@ -18,12 +13,10 @@ function lastClose(points) {
 export function useStockPriceRefresh() {
   const purchases = useFinanceStore((s) => s.investmentPurchases);
   const updateEtfPrice = useFinanceStore((s) => s.updateEtfPrice);
-
-  const chartCache = useSyncExternalStore(
-    subscribeChartCache,
-    getChartCache,
-    getChartCache
-  );
+  const setMarketData = useFinanceStore((s) => s.setMarketData);
+  const priceHistory = useFinanceStore((s) => s.marketPriceHistory);
+  const chartTicker = useFinanceStore((s) => s.marketChartTicker);
+  const marketLastRefresh = useFinanceStore((s) => s.marketLastRefresh);
 
   const [loading, setLoading] = useState(false);
   const [quoteErrors, setQuoteErrors] = useState({});
@@ -31,11 +24,13 @@ export function useStockPriceRefresh() {
   const [priceFallbacks, setPriceFallbacks] = useState({});
 
   const tickers = [...new Set(purchases.map((p) => p.ticker))];
-  const { priceHistory, chartTicker, lastRefresh } = chartCache;
 
-  const setChartTicker = useCallback((ticker) => {
-    setChartCache({ chartTicker: ticker });
-  }, []);
+  const setChartTicker = useCallback(
+    (ticker) => {
+      setMarketData({ marketChartTicker: ticker });
+    },
+    [setMarketData]
+  );
 
   const refreshPrices = useCallback(async () => {
     if (tickers.length === 0) return;
@@ -65,19 +60,13 @@ export function useStockPriceRefresh() {
         }
       }
 
-      const currentTicker = getChartCache().chartTicker;
+      const currentTicker = useFinanceStore.getState().marketChartTicker;
       const nextTicker =
         currentTicker && tickers.includes(currentTicker)
           ? currentTicker
           : tickers[0];
 
-      setChartCache({
-        priceHistory: history,
-        chartTicker: nextTicker,
-        lastRefresh: new Date().toISOString(),
-      });
-
-      useFinanceStore.getState().setMarketData({
+      setMarketData({
         marketPriceHistory: history,
         marketChartTicker: nextTicker,
         marketLastRefresh: new Date().toISOString(),
@@ -90,14 +79,14 @@ export function useStockPriceRefresh() {
     } finally {
       setLoading(false);
     }
-  }, [tickers.join(","), updateEtfPrice]);
+  }, [tickers.join(","), updateEtfPrice, setMarketData]);
 
-  const lastRefreshDate = lastRefresh ? new Date(lastRefresh) : null;
+  const lastRefresh = marketLastRefresh ? new Date(marketLastRefresh) : null;
 
   return {
     refreshPrices,
     loading,
-    lastRefresh: lastRefreshDate,
+    lastRefresh,
     quoteErrors,
     chartErrors,
     priceFallbacks,

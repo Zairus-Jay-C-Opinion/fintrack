@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Button from "../ui/Button";
+import CustomRangeSlider from "../ui/CustomRangeSlider";
 import { formatPercent } from "../../utils/formatters";
 
 const KEYS = ["investments", "savings", "spending"];
@@ -8,13 +9,6 @@ const LABELS = {
   savings: "Savings",
   spending: "Spending",
 };
-
-function sliderTrackStyle(percent) {
-  const p = Math.min(100, Math.max(0, percent));
-  return {
-    background: `linear-gradient(to right, #5b8fa8 0%, #5b8fa8 ${p}%, #253745 ${p}%, #253745 100%)`,
-  };
-}
 
 export default function AllocationEditor({ allocation, onSave }) {
   const [local, setLocal] = useState({
@@ -35,7 +29,7 @@ export default function AllocationEditor({ allocation, onSave }) {
   const valid = Math.abs(total - 100) < 0.5;
 
   const handleChange = (key, value) => {
-    setLocal((prev) => ({ ...prev, [key]: parseFloat(value) || 0 }));
+    setLocal((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSave = () => {
@@ -55,15 +49,11 @@ export default function AllocationEditor({ allocation, onSave }) {
             <span className="text-text-secondary">{LABELS[key]}</span>
             <span className="font-mono text-white">{local[key].toFixed(0)}%</span>
           </div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="1"
+          <CustomRangeSlider
+            min={0}
+            max={100}
             value={local[key]}
-            onChange={(e) => handleChange(key, e.target.value)}
-            className="allocation-slider w-full"
-            style={sliderTrackStyle(local[key])}
+            onChange={(v) => handleChange(key, v)}
           />
         </div>
       ))}

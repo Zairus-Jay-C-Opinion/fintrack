@@ -2,12 +2,20 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
-import { initChartCache } from "./utils/chartCache";
+import { useFinanceStore } from "./store/useFinanceStore";
 
-initChartCache();
+function renderApp() {
+  createRoot(document.getElementById("root")).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+}
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+const persist = useFinanceStore.persist;
+
+if (persist.hasHydrated()) {
+  renderApp();
+} else {
+  persist.onFinishHydration(renderApp);
+}
