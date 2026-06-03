@@ -10,6 +10,11 @@ export async function fetchQuote(symbol, apiKey) {
     `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(sym)}&token=${apiKey}`
   );
   const data = await res.json().catch(() => ({}));
+  if (data.error) {
+    throw new Error(
+      typeof data.error === "string" ? data.error : "Finnhub request failed"
+    );
+  }
   if (!res.ok) {
     const msg = data.error || data.message || `Finnhub error (${res.status})`;
     throw new Error(msg);

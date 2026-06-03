@@ -48,6 +48,7 @@ export default function Investments() {
     lastRefresh,
     quoteErrors,
     chartErrors,
+    priceFallbacks,
     priceHistory,
     chartTicker,
     setChartTicker,
@@ -97,10 +98,10 @@ export default function Investments() {
   };
 
   return (
-    <>
+    <div className="min-w-0 max-w-full">
       <TopBar
         title="Investments"
-        subtitle={`${userProfile.broker} portfolio — stocks, ETFs, and more`}
+        subtitle={`${userProfile.broker} portfolio`}
       />
 
       <PageHelp title="Understanding Investments">
@@ -130,7 +131,7 @@ export default function Investments() {
         </p>
       )}
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label="Total Invested" value={formatUsd(totalInvested)} sub="What you paid" />
         <StatCard
           label="Current Value"
@@ -214,18 +215,18 @@ export default function Investments() {
               Add purchase
             </Button>
           </div>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className="mt-4 -mx-1 overflow-x-auto overscroll-x-contain px-1">
+            <table className="w-full min-w-[520px] text-left text-xs sm:text-sm">
               <thead>
                 <tr className="border-b border-accent text-text-secondary">
-                  <th className="pb-2 pr-3">Symbol</th>
-                  <th className="pb-2 pr-3">Type</th>
-                  <th className="pb-2 pr-3">Shares</th>
-                  <th className="pb-2 pr-3">Avg cost</th>
-                  <th className="pb-2 pr-3">Price</th>
-                  <th className="pb-2 pr-3">Value</th>
-                  <th className="pb-2 pr-3">Gain</th>
-                  <th className="pb-2 w-16" />
+                  <th className="pb-2 pr-2">Symbol</th>
+                  <th className="hidden pb-2 pr-2 sm:table-cell">Type</th>
+                  <th className="pb-2 pr-2">Shares</th>
+                  <th className="pb-2 pr-2">Avg</th>
+                  <th className="pb-2 pr-2">Price</th>
+                  <th className="pb-2 pr-2">Value</th>
+                  <th className="pb-2 pr-2">Gain</th>
+                  <th className="pb-2 w-10" />
                 </tr>
               </thead>
               <tbody>
@@ -241,19 +242,19 @@ export default function Investments() {
                       <td className="py-3 pr-3 font-medium text-white">
                         {h.ticker}
                       </td>
-                      <td className="py-3 pr-3 text-text-secondary">
+                      <td className="hidden py-3 pr-2 text-text-secondary sm:table-cell">
                         {h.assetType}
                       </td>
-                      <td className="py-3 pr-3 font-mono">
-                        {h.shares.toFixed(4)}
+                      <td className="py-3 pr-2 font-mono">
+                        {h.shares.toFixed(2)}
                       </td>
-                      <td className="py-3 pr-3 font-mono">
+                      <td className="py-3 pr-2 font-mono">
                         {formatUsd(h.avgCost)}
                       </td>
-                      <td className="py-3 pr-3 font-mono">
-                        {formatUsd(h.currentPrice)}
+                      <td className="py-3 pr-2 font-mono">
+                        {h.currentPrice > 0 ? formatUsd(h.currentPrice) : "—"}
                       </td>
-                      <td className="py-3 pr-3 font-mono text-white">
+                      <td className="py-3 pr-2 font-mono text-white">
                         {formatUsd(h.currentValue)}
                         <span className="block text-xs text-text-secondary">
                           {formatPhp(usdToPhp(h.currentValue, phpUsdRate))}
@@ -327,6 +328,18 @@ export default function Investments() {
                 Last updated {lastRefresh.toLocaleTimeString()}
               </p>
             )}
+            {Object.keys(priceFallbacks).length > 0 && (
+              <div className="mb-2 rounded-[var(--radius-sm)] border border-highlight/30 bg-highlight/10 p-2 text-xs text-text-primary">
+                <p className="font-medium text-highlight">Price from chart (estimate)</p>
+                <ul className="mt-1 list-inside list-disc text-text-secondary">
+                  {Object.entries(priceFallbacks).map(([symbol, msg]) => (
+                    <li key={symbol}>
+                      <span className="font-mono text-white">{symbol}</span>: {msg}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {Object.keys(quoteErrors).filter((k) => k !== "_").length > 0 && (
               <div className="mb-2 rounded-[var(--radius-sm)] border border-warning/40 bg-warning/10 p-2 text-xs text-warning">
                 <p className="font-medium">Live price could not load:</p>
@@ -341,10 +354,10 @@ export default function Investments() {
                     ))}
                 </ul>
                 <p className="mt-2 text-text-secondary">
-                  Check the ticker (e.g. VOO), wait a minute if rate-limited, or
-                  set the price manually below. On deploy, ensure{" "}
-                  <span className="font-mono">FINNHUB_API_KEY</span> is set on the
-                  host.
+                  If this says <span className="font-mono">Invalid API key</span>, open
+                  Vercel → Settings → Environment Variables → fix{" "}
+                  <span className="font-mono">FINNHUB_API_KEY</span> (no spaces, then
+                  Redeploy). You can still set prices manually below.
                 </p>
               </div>
             )}
@@ -491,6 +504,6 @@ export default function Investments() {
           }
         }}
       />
-    </>
+    </div>
   );
 }

@@ -7,6 +7,11 @@ import {
   fetchMultipleCandles,
 } from "../utils/stockPrices";
 
+function lastClose(points) {
+  if (!points?.length) return null;
+  return points[points.length - 1].price;
+}
+
 export function useStockPriceRefresh() {
   const location = useLocation();
   const purchases = useFinanceStore((s) => s.investmentPurchases);
@@ -17,6 +22,7 @@ export function useStockPriceRefresh() {
   const [lastRefresh, setLastRefresh] = useState(null);
   const [quoteErrors, setQuoteErrors] = useState({});
   const [chartErrors, setChartErrors] = useState({});
+  const [priceFallbacks, setPriceFallbacks] = useState({});
   const [priceHistory, setPriceHistory] = useState({});
   const [chartTicker, setChartTicker] = useState("");
 
@@ -27,16 +33,32 @@ export function useStockPriceRefresh() {
     setLoading(true);
     setQuoteErrors({});
     setChartErrors({});
+    setPriceFallbacks({});
     try {
-      const { results, errors: qErr } = await fetchMultipleQuotes(tickers);
-      Object.entries(results).forEach(([ticker, price]) => {
-        updateEtfPrice(ticker, price);
-      });
-      setQuoteErrors(qErr);
-
       const { history, errors: cErr } = await fetchMultipleCandles(tickers, 90);
       setPriceHistory(history);
       setChartErrors(cErr);
+
+      const { results, errors: qErr } = await fetchMultipleQuotes(tickers);
+      const remainingQuoteErrors = { ...qErr };
+      const fallbacks = {};
+
+      for (const ticker of tickers) {
+        if (results[ticker] != null) {
+          updateEtfPrice(ticker, results[ticker]);
+          continue;
+        }
+        const close = lastClose(history[ticker]);
+        if (close != null && close > 0) {
+          updateEtfPrice(ticker, close);
+          delete remainingQuoteErrors[ticker];
+          fallbacks[ticker] =
+            "Using latest chart close (Finnhub live quote unavailable on server).";
+        }
+      }
+
+      setQuoteErrors(remainingQuoteErrors);
+      setPriceFallbacks(fallbacks);
 
       if (!chartTicker && tickers.length) {
         setChartTicker(tickers[0]);
@@ -71,6 +93,7 @@ export function useStockPriceRefresh() {
     lastRefresh,
     quoteErrors,
     chartErrors,
+    priceFallbacks,
     priceHistory,
     chartTicker,
     setChartTicker,

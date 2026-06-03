@@ -2,7 +2,7 @@ import { Menu } from "lucide-react";
 
 export default function TopBar({ title, subtitle, onMenuClick }) {
   return (
-    <header className="mb-6 flex items-start justify-between gap-4">
+    <header className="mb-4 flex min-w-0 items-start justify-between gap-3 sm:mb-6">
       <div className="flex items-start gap-3">
         {onMenuClick && (
           <button
@@ -14,7 +14,7 @@ export default function TopBar({ title, subtitle, onMenuClick }) {
           </button>
         )}
         <div>
-          <h1 className="font-display text-2xl font-bold text-white md:text-3xl">
+          <h1 className="font-display text-xl font-bold text-white sm:text-2xl md:text-3xl">
             {title}
           </h1>
           {subtitle && (

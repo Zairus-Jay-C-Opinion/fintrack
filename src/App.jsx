@@ -18,9 +18,9 @@ function AppRoutes() {
   const [sidebarCollapsed] = useState(false);
 
   return (
-    <div className="flex h-full min-h-[100dvh] bg-bg-deepest pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
+    <div className="flex h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-bg-deepest pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:h-full md:max-h-none md:pb-0">
       <Sidebar collapsed={sidebarCollapsed} />
-      <main className="flex min-h-0 flex-1 flex-col">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <PageWrapper>
           <Routes>
             <Route path="/" element={<Dashboard />} />
