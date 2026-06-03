@@ -89,15 +89,7 @@ export default function Expenses() {
 
   return (
     <div className="page-shell">
-      <TopBar
-        title="Expenses"
-        subtitle={`${monthLabel} spending`}
-        actions={
-          <Button size="sm" onClick={openLog}>
-            Log purchase
-          </Button>
-        }
-      />
+      <TopBar title="Expenses" subtitle={`${monthLabel} spending`} />
 
       <PageHelp title="How budgets work">
         <p>
@@ -163,20 +155,9 @@ export default function Expenses() {
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <div className="card lg:col-span-2">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold text-white">
-              Purchase log
-            </h3>
-            <Button
-              size="sm"
-              onClick={() => {
-                setEditing(null);
-                setModalOpen(true);
-              }}
-            >
-              Log purchase
-            </Button>
-          </div>
+          <h3 className="font-display text-lg font-semibold text-white">
+            Purchase log
+          </h3>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
@@ -238,6 +219,11 @@ export default function Expenses() {
               </tbody>
             </table>
           </div>
+          <div className="mt-4 flex justify-start">
+            <Button size="sm" onClick={openLog}>
+              Log purchase
+            </Button>
+          </div>
         </div>
 
         <div className="card">
@@ -266,16 +252,12 @@ export default function Expenses() {
           setEditing(null);
         }}
         title={editing ? "Edit expense" : "Log a purchase"}
-        footer={
-          <Button type="submit" form="add-expense-form" className="w-full">
-            {editing ? "Save changes" : "Log purchase"}
-          </Button>
-        }
       >
         <AddExpenseForm
           key={editing?.id ?? "new"}
           formId="add-expense-form"
           initialData={editing}
+          submitLabel={editing ? "Save changes" : "Log purchase"}
           onSubmit={handleSubmit}
         />
       </Modal>

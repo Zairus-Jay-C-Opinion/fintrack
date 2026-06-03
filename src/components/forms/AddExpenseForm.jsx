@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Input from "../ui/Input";
 import FormSelect from "../ui/FormSelect";
+import Button from "../ui/Button";
 import { format } from "date-fns";
 import { EXPENSE_CATEGORIES } from "../../utils/expenses";
 
@@ -8,6 +9,7 @@ export default function AddExpenseForm({
   onSubmit,
   initialData = null,
   formId = "add-expense-form",
+  submitLabel = "Log purchase",
 }) {
   const [form, setForm] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
@@ -83,6 +85,9 @@ export default function AddExpenseForm({
         value={form.note}
         onChange={(e) => setForm({ ...form, note: e.target.value })}
       />
+      <Button type="submit" className="mt-2 w-full">
+        {submitLabel}
+      </Button>
     </form>
   );
 }

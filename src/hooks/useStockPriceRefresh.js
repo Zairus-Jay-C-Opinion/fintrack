@@ -1,19 +1,10 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useFinanceStore } from "../store/useFinanceStore";
+import { useMarketStore } from "../store/useMarketStore";
 import {
   fetchMultipleQuotes,
   fetchMultipleCandles,
 } from "../utils/stockPrices";
-
-/** Survives leaving the Investments route; only changes on Refresh live. */
-const marketCache = {
-  priceHistory: {},
-  lastRefresh: null,
-  chartTicker: "",
-  quoteErrors: {},
-  chartErrors: {},
-  priceFallbacks: {},
-};
 
 function lastClose(points) {
   if (!points?.length) return null;
@@ -24,37 +15,30 @@ export function useStockPriceRefresh() {
   const purchases = useFinanceStore((s) => s.investmentPurchases);
   const updateEtfPrice = useFinanceStore((s) => s.updateEtfPrice);
 
-  const [loading, setLoading] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState(marketCache.lastRefresh);
-  const [quoteErrors, setQuoteErrors] = useState(marketCache.quoteErrors);
-  const [chartErrors, setChartErrors] = useState(marketCache.chartErrors);
-  const [priceFallbacks, setPriceFallbacks] = useState(marketCache.priceFallbacks);
-  const [priceHistory, setPriceHistory] = useState(marketCache.priceHistory);
-  const [chartTicker, setChartTickerState] = useState(marketCache.chartTicker);
+  const priceHistory = useMarketStore((s) => s.priceHistory);
+  const chartTicker = useMarketStore((s) => s.chartTicker);
+  const lastRefresh = useMarketStore((s) => s.lastRefresh);
+  const quoteErrors = useMarketStore((s) => s.quoteErrors);
+  const chartErrors = useMarketStore((s) => s.chartErrors);
+  const priceFallbacks = useMarketStore((s) => s.priceFallbacks);
+  const loading = useMarketStore((s) => s.loading);
+  const setMarket = useMarketStore((s) => s.setMarket);
+  const clearMarketMessages = useMarketStore((s) => s.clearMarketMessages);
 
   const tickers = [...new Set(purchases.map((p) => p.ticker))];
 
-  const setChartTicker = useCallback((ticker) => {
-    marketCache.chartTicker = ticker;
-    setChartTickerState(ticker);
-  }, []);
+  const setChartTicker = useCallback(
+    (ticker) => setMarket({ chartTicker: ticker }),
+    [setMarket]
+  );
 
   const refreshPrices = useCallback(async () => {
     if (tickers.length === 0) return;
-    setLoading(true);
-    setQuoteErrors({});
-    setChartErrors({});
-    setPriceFallbacks({});
-    marketCache.quoteErrors = {};
-    marketCache.chartErrors = {};
-    marketCache.priceFallbacks = {};
+    setMarket({ loading: true });
+    clearMarketMessages();
 
     try {
       const { history, errors: cErr } = await fetchMultipleCandles(tickers, 90);
-      marketCache.priceHistory = history;
-      marketCache.chartErrors = cErr;
-      setPriceHistory(history);
-      setChartErrors(cErr);
 
       const { results, errors: qErr } = await fetchMultipleQuotes(tickers);
       const remainingQuoteErrors = { ...qErr };
@@ -74,45 +58,36 @@ export function useStockPriceRefresh() {
         }
       }
 
-      marketCache.quoteErrors = remainingQuoteErrors;
-      marketCache.priceFallbacks = fallbacks;
-      setQuoteErrors(remainingQuoteErrors);
-      setPriceFallbacks(fallbacks);
-
+      const currentTicker = useMarketStore.getState().chartTicker;
       const nextTicker =
-        marketCache.chartTicker && tickers.includes(marketCache.chartTicker)
-          ? marketCache.chartTicker
+        currentTicker && tickers.includes(currentTicker)
+          ? currentTicker
           : tickers[0];
-      marketCache.chartTicker = nextTicker;
-      setChartTickerState(nextTicker);
 
-      const now = new Date();
-      marketCache.lastRefresh = now;
-      setLastRefresh(now);
+      setMarket({
+        priceHistory: history,
+        chartErrors: cErr,
+        quoteErrors: remainingQuoteErrors,
+        priceFallbacks: fallbacks,
+        chartTicker: nextTicker,
+        lastRefresh: new Date(),
+        loading: false,
+      });
     } catch (e) {
-      const err = { _: e.message };
-      marketCache.quoteErrors = err;
-      setQuoteErrors(err);
-    } finally {
-      setLoading(false);
+      setMarket({
+        quoteErrors: { _: e.message },
+        loading: false,
+      });
     }
-  }, [tickers.join(","), updateEtfPrice]);
+  }, [tickers.join(","), updateEtfPrice, setMarket, clearMarketMessages]);
 
   useEffect(() => {
-    if (tickers.length && !chartTicker) {
-      const first = tickers[0];
-      marketCache.chartTicker = first;
-      setChartTickerState(first);
-    } else if (
-      chartTicker &&
-      tickers.length &&
-      !tickers.includes(chartTicker)
-    ) {
-      const first = tickers[0];
-      marketCache.chartTicker = first;
-      setChartTickerState(first);
+    if (!tickers.length) return;
+    const current = useMarketStore.getState().chartTicker;
+    if (!current || !tickers.includes(current)) {
+      setMarket({ chartTicker: tickers[0] });
     }
-  }, [tickers.join(","), chartTicker]);
+  }, [tickers.join(","), setMarket]);
 
   return {
     refreshPrices,

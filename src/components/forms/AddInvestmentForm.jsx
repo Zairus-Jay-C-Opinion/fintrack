@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Input from "../ui/Input";
 import FormSelect from "../ui/FormSelect";
+import Button from "../ui/Button";
 import { format } from "date-fns";
 import { useSettingsStore } from "../../store/useSettingsStore";
 
@@ -10,6 +11,7 @@ export default function AddInvestmentForm({
   onSubmit,
   initialData = null,
   formId = "add-investment-form",
+  submitLabel = "Record purchase",
 }) {
   const phpUsdRate = useSettingsStore((s) => s.phpUsdRate);
   const [form, setForm] = useState({
@@ -127,6 +129,13 @@ export default function AddInvestmentForm({
         value={form.note}
         onChange={(e) => setForm({ ...form, note: e.target.value })}
       />
+      <Button
+        type="submit"
+        className="mt-2 w-full"
+        disabled={!ticker}
+      >
+        {submitLabel}
+      </Button>
     </form>
   );
 }

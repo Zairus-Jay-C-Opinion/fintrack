@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
-export default function Modal({ open, onClose, title, children, footer }) {
+export default function Modal({ open, onClose, title, children }) {
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -94,17 +94,11 @@ export default function Modal({ open, onClose, title, children, footer }) {
             </div>
 
             <div
-              className="min-h-0 flex-1 overflow-y-scroll overscroll-y-contain px-4 py-3 [-webkit-overflow-scrolling:touch]"
+              className="min-h-0 flex-1 overflow-y-scroll overscroll-y-contain px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]"
               style={{ touchAction: "pan-y" }}
             >
               <div className="min-w-0 max-w-full">{children}</div>
             </div>
-
-            {footer && (
-              <div className="shrink-0 border-t border-accent/60 bg-bg-mid px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-                {footer}
-              </div>
-            )}
           </motion.div>
         </motion.div>
       )}

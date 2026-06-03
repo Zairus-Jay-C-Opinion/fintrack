@@ -102,15 +102,7 @@ export default function Goals() {
 
   return (
     <div className="page-shell">
-      <TopBar
-        title="Goals"
-        subtitle="Save toward targets"
-        actions={
-          <Button size="sm" onClick={() => setGoalModal(true)}>
-            Add goal
-          </Button>
-        }
-      />
+      <TopBar title="Goals" subtitle="Save toward targets" />
 
       <PageHelp title="How Goals works">
         <ul className="list-inside list-disc space-y-2">
@@ -136,45 +128,46 @@ export default function Goals() {
         <StatCard label="Combined targets" value={formatPhp(totalTarget)} />
       </div>
 
-      <div className="mb-6 flex flex-wrap gap-3">
-        <Button onClick={() => setGoalModal(true)}>Add goal</Button>
-        <Button
-          variant="secondary"
-          onClick={() => setFundModal(true)}
-          disabled={savingsGoals.length === 0}
-        >
-          Fund goals
-        </Button>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {savingsGoals.length === 0 ? (
-          <p className="text-text-secondary">No goals yet — add your first goal</p>
-        ) : (
-          savingsGoals.map((g) => (
-            <GoalCard
-              key={g.id}
-              goal={g}
-              onDelete={removeSavingsGoal}
-              onUpdateProgress={(goal) => {
-                setEditingGoal(goal);
-                setProgressInput(String(goal.current));
-                setProgressModal(true);
-              }}
-            />
-          ))
-        )}
+      <div className="card mb-6">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {savingsGoals.length === 0 ? (
+            <p className="text-text-secondary sm:col-span-2 lg:col-span-3">
+              No goals yet — add your first goal below
+            </p>
+          ) : (
+            savingsGoals.map((g) => (
+              <GoalCard
+                key={g.id}
+                goal={g}
+                onDelete={removeSavingsGoal}
+                onUpdateProgress={(goal) => {
+                  setEditingGoal(goal);
+                  setProgressInput(String(goal.current));
+                  setProgressModal(true);
+                }}
+              />
+            ))
+          )}
+        </div>
+        <div className="mt-4 flex flex-wrap justify-start gap-3">
+          <Button size="sm" onClick={() => setGoalModal(true)}>
+            Add goal
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setFundModal(true)}
+            disabled={savingsGoals.length === 0}
+          >
+            Fund goals
+          </Button>
+        </div>
       </div>
 
       <Modal
         open={goalModal}
         onClose={() => setGoalModal(false)}
         title="New goal"
-        footer={
-          <Button type="submit" form="new-goal-form" className="w-full">
-            Create goal
-          </Button>
-        }
       >
         <form id="new-goal-form" onSubmit={handleAddGoal} className="space-y-4">
           <Input
@@ -207,6 +200,9 @@ export default function Goals() {
             onChange={(e) => setGoalForm({ ...goalForm, targetDate: e.target.value })}
             required
           />
+          <Button type="submit" className="mt-2 w-full">
+            Create goal
+          </Button>
         </form>
       </Modal>
 
@@ -214,15 +210,6 @@ export default function Goals() {
         open={fundModal}
         onClose={() => setFundModal(false)}
         title="Fund goals"
-        footer={
-          <Button
-            className="w-full"
-            onClick={applyFunding}
-            disabled={totalPool <= 0}
-          >
-            Apply to goals
-          </Button>
-        }
       >
         <div className="space-y-4">
           <p className="text-sm text-text-secondary">
@@ -282,6 +269,13 @@ export default function Goals() {
             <p className="text-gain">{formatPhp(preview.applied)}</p>
           </div>
 
+          <Button
+            className="mt-2 w-full"
+            onClick={applyFunding}
+            disabled={totalPool <= 0}
+          >
+            Apply to goals
+          </Button>
         </div>
       </Modal>
 
@@ -292,11 +286,6 @@ export default function Goals() {
           setEditingGoal(null);
         }}
         title={`Update — ${editingGoal?.name ?? ""}`}
-        footer={
-          <Button type="submit" form="goal-progress-form" className="w-full">
-            Save
-          </Button>
-        }
       >
         <form
           id="goal-progress-form"
@@ -320,6 +309,9 @@ export default function Goals() {
             onChange={(e) => setProgressInput(e.target.value)}
             required
           />
+          <Button type="submit" className="mt-2 w-full">
+            Save
+          </Button>
         </form>
       </Modal>
     </div>

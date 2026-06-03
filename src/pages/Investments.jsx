@@ -102,11 +102,6 @@ export default function Investments() {
       <TopBar
         title="Investments"
         subtitle={`${userProfile.broker} portfolio`}
-        actions={
-          <Button size="sm" onClick={openAdd}>
-            Add purchase
-          </Button>
-        }
       />
 
       <PageHelp title="Understanding Investments">
@@ -158,21 +153,11 @@ export default function Investments() {
 
       <div className="mb-4 grid gap-4 lg:grid-cols-3">
         <div className="card min-w-0 lg:col-span-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="font-display text-lg font-semibold text-white">
-              Holdings
-            </h3>
-            <Button size="sm" onClick={openAdd} className="hidden sm:inline-flex">
-              Add purchase
-            </Button>
-          </div>
+          <h3 className="font-display text-lg font-semibold text-white">
+            Holdings
+          </h3>
           {holdings.length === 0 ? (
-            <div className="mt-6 rounded-lg border border-dashed border-accent/80 py-8 text-center">
-              <p className="text-sm text-text-secondary">No purchases yet</p>
-              <Button className="mt-4" onClick={openAdd}>
-                Add purchase
-              </Button>
-            </div>
+            <p className="mt-4 text-sm text-text-secondary">No purchases yet</p>
           ) : (
           <div className="mt-4 max-w-full overflow-x-auto overscroll-x-contain">
             <table className="w-full min-w-[520px] text-left text-xs sm:text-sm">
@@ -241,6 +226,11 @@ export default function Investments() {
             </table>
           </div>
           )}
+          <div className="mt-4 flex justify-start">
+            <Button size="sm" onClick={openAdd}>
+              Add purchase
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-4 min-w-0">
@@ -486,29 +476,15 @@ export default function Investments() {
           setEditingPurchase(null);
         }}
         title={editingPurchase ? "Edit purchase" : "Add purchase"}
-        footer={
-          <Button type="submit" form="add-investment-form" className="w-full">
-            {editingPurchase ? "Save changes" : "Record purchase"}
-          </Button>
-        }
       >
         <AddInvestmentForm
           key={editingPurchase?.id ?? "new"}
           formId="add-investment-form"
           initialData={editingPurchase}
+          submitLabel={editingPurchase ? "Save changes" : "Record purchase"}
           onSubmit={handleSubmit}
         />
       </Modal>
-
-      {!modalOpen && (
-        <button
-          type="button"
-          onClick={openAdd}
-          className="fixed bottom-[calc(4.25rem+env(safe-area-inset-bottom))] right-4 z-30 rounded-full bg-highlight px-4 py-3 text-sm font-semibold text-white shadow-elevated md:hidden"
-        >
-          + Add purchase
-        </button>
-      )}
 
       <EditHoldingModal
         open={!!editingHolding}
