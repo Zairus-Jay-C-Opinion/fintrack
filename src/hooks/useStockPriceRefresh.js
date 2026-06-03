@@ -1,11 +1,19 @@
-import { useEffect, useCallback, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useCallback, useState, useEffect } from "react";
 import { useFinanceStore } from "../store/useFinanceStore";
-import { useSettingsStore } from "../store/useSettingsStore";
 import {
   fetchMultipleQuotes,
   fetchMultipleCandles,
 } from "../utils/stockPrices";
+
+/** Survives leaving the Investments route; only changes on Refresh live. */
+const marketCache = {
+  priceHistory: {},
+  lastRefresh: null,
+  chartTicker: "",
+  quoteErrors: {},
+  chartErrors: {},
+  priceFallbacks: {},
+};
 
 function lastClose(points) {
   if (!points?.length) return null;
@@ -13,20 +21,23 @@ function lastClose(points) {
 }
 
 export function useStockPriceRefresh() {
-  const location = useLocation();
   const purchases = useFinanceStore((s) => s.investmentPurchases);
   const updateEtfPrice = useFinanceStore((s) => s.updateEtfPrice);
-  const autoRefresh = useSettingsStore((s) => s.autoRefreshStockPrices);
-  const refreshMinutes = useSettingsStore((s) => s.stockRefreshMinutes);
+
   const [loading, setLoading] = useState(false);
-  const [lastRefresh, setLastRefresh] = useState(null);
-  const [quoteErrors, setQuoteErrors] = useState({});
-  const [chartErrors, setChartErrors] = useState({});
-  const [priceFallbacks, setPriceFallbacks] = useState({});
-  const [priceHistory, setPriceHistory] = useState({});
-  const [chartTicker, setChartTicker] = useState("");
+  const [lastRefresh, setLastRefresh] = useState(marketCache.lastRefresh);
+  const [quoteErrors, setQuoteErrors] = useState(marketCache.quoteErrors);
+  const [chartErrors, setChartErrors] = useState(marketCache.chartErrors);
+  const [priceFallbacks, setPriceFallbacks] = useState(marketCache.priceFallbacks);
+  const [priceHistory, setPriceHistory] = useState(marketCache.priceHistory);
+  const [chartTicker, setChartTickerState] = useState(marketCache.chartTicker);
 
   const tickers = [...new Set(purchases.map((p) => p.ticker))];
+
+  const setChartTicker = useCallback((ticker) => {
+    marketCache.chartTicker = ticker;
+    setChartTickerState(ticker);
+  }, []);
 
   const refreshPrices = useCallback(async () => {
     if (tickers.length === 0) return;
@@ -34,8 +45,14 @@ export function useStockPriceRefresh() {
     setQuoteErrors({});
     setChartErrors({});
     setPriceFallbacks({});
+    marketCache.quoteErrors = {};
+    marketCache.chartErrors = {};
+    marketCache.priceFallbacks = {};
+
     try {
       const { history, errors: cErr } = await fetchMultipleCandles(tickers, 90);
+      marketCache.priceHistory = history;
+      marketCache.chartErrors = cErr;
       setPriceHistory(history);
       setChartErrors(cErr);
 
@@ -57,35 +74,45 @@ export function useStockPriceRefresh() {
         }
       }
 
+      marketCache.quoteErrors = remainingQuoteErrors;
+      marketCache.priceFallbacks = fallbacks;
       setQuoteErrors(remainingQuoteErrors);
       setPriceFallbacks(fallbacks);
 
-      if (!chartTicker && tickers.length) {
-        setChartTicker(tickers[0]);
-      }
-      setLastRefresh(new Date());
+      const nextTicker =
+        marketCache.chartTicker && tickers.includes(marketCache.chartTicker)
+          ? marketCache.chartTicker
+          : tickers[0];
+      marketCache.chartTicker = nextTicker;
+      setChartTickerState(nextTicker);
+
+      const now = new Date();
+      marketCache.lastRefresh = now;
+      setLastRefresh(now);
     } catch (e) {
-      setQuoteErrors({ _: e.message });
+      const err = { _: e.message };
+      marketCache.quoteErrors = err;
+      setQuoteErrors(err);
     } finally {
       setLoading(false);
     }
-  }, [tickers.join(","), updateEtfPrice, chartTicker]);
+  }, [tickers.join(","), updateEtfPrice]);
 
   useEffect(() => {
     if (tickers.length && !chartTicker) {
-      setChartTicker(tickers[0]);
+      const first = tickers[0];
+      marketCache.chartTicker = first;
+      setChartTickerState(first);
+    } else if (
+      chartTicker &&
+      tickers.length &&
+      !tickers.includes(chartTicker)
+    ) {
+      const first = tickers[0];
+      marketCache.chartTicker = first;
+      setChartTickerState(first);
     }
   }, [tickers.join(","), chartTicker]);
-
-  useEffect(() => {
-    if (location.pathname !== "/investments" || !autoRefresh || tickers.length === 0) {
-      return;
-    }
-    refreshPrices();
-    const ms = Math.max(5, refreshMinutes) * 60 * 1000;
-    const id = setInterval(refreshPrices, ms);
-    return () => clearInterval(id);
-  }, [location.pathname, autoRefresh, refreshMinutes, refreshPrices, tickers.length]);
 
   return {
     refreshPrices,

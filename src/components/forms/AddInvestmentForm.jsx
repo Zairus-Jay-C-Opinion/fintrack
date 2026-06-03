@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Input from "../ui/Input";
 import FormSelect from "../ui/FormSelect";
-import Button from "../ui/Button";
 import { format } from "date-fns";
 import { useSettingsStore } from "../../store/useSettingsStore";
 
@@ -9,11 +8,8 @@ const ASSET_TYPES = ["Stock", "ETF", "Mutual fund", "REIT", "Other"];
 
 export default function AddInvestmentForm({
   onSubmit,
-  onCancel,
   initialData = null,
-  submitLabel = "Record purchase",
   formId = "add-investment-form",
-  hideActions = false,
 }) {
   const phpUsdRate = useSettingsStore((s) => s.phpUsdRate);
   const [form, setForm] = useState({
@@ -131,23 +127,6 @@ export default function AddInvestmentForm({
         value={form.note}
         onChange={(e) => setForm({ ...form, note: e.target.value })}
       />
-      {!hideActions && (
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button type="submit" className="w-full sm:w-auto" disabled={!ticker}>
-            {submitLabel}
-          </Button>
-          {onCancel && (
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full sm:w-auto"
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-          )}
-        </div>
-      )}
     </form>
   );
 }

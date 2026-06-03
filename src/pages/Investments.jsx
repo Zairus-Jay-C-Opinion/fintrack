@@ -487,39 +487,16 @@ export default function Investments() {
         }}
         title={editingPurchase ? "Edit purchase" : "Add purchase"}
         footer={
-          <div className="flex flex-col gap-2">
-            <Button
-              type="submit"
-              form="add-investment-form"
-              className="w-full"
-            >
-              {editingPurchase ? "Save changes" : "Record purchase"}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => {
-                setModalOpen(false);
-                setEditingPurchase(null);
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
+          <Button type="submit" form="add-investment-form" className="w-full">
+            {editingPurchase ? "Save changes" : "Record purchase"}
+          </Button>
         }
       >
         <AddInvestmentForm
           key={editingPurchase?.id ?? "new"}
           formId="add-investment-form"
-          hideActions
           initialData={editingPurchase}
-          submitLabel={editingPurchase ? "Save changes" : "Record purchase"}
           onSubmit={handleSubmit}
-          onCancel={() => {
-            setModalOpen(false);
-            setEditingPurchase(null);
-          }}
         />
       </Modal>
 

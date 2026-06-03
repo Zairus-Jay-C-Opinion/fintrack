@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
 import Input from "../ui/Input";
 import FormSelect from "../ui/FormSelect";
-import Button from "../ui/Button";
 import { format } from "date-fns";
 import { EXPENSE_CATEGORIES } from "../../utils/expenses";
 
 export default function AddExpenseForm({
   onSubmit,
-  onCancel,
   initialData = null,
-  submitLabel = "Add expense",
   formId = "add-expense-form",
-  hideActions = false,
 }) {
   const [form, setForm] = useState({
     date: format(new Date(), "yyyy-MM-dd"),
@@ -87,23 +83,6 @@ export default function AddExpenseForm({
         value={form.note}
         onChange={(e) => setForm({ ...form, note: e.target.value })}
       />
-      {!hideActions && (
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button type="submit" className="w-full sm:w-auto">
-            {submitLabel}
-          </Button>
-          {onCancel && (
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full sm:w-auto"
-              onClick={onCancel}
-            >
-              Cancel
-            </Button>
-          )}
-        </div>
-      )}
     </form>
   );
 }
