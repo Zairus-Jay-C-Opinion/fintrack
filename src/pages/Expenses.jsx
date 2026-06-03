@@ -82,11 +82,21 @@ export default function Expenses() {
     setEditing(null);
   };
 
+  const openLog = () => {
+    setEditing(null);
+    setModalOpen(true);
+  };
+
   return (
-    <>
+    <div className="min-w-0 max-w-full overflow-x-hidden">
       <TopBar
         title="Expenses"
-        subtitle={`Track purchases against your ${monthLabel} spending budget`}
+        subtitle={`${monthLabel} spending`}
+        actions={
+          <Button size="sm" onClick={openLog}>
+            Log purchase
+          </Button>
+        }
       />
 
       <PageHelp title="How budgets work">
@@ -268,6 +278,6 @@ export default function Expenses() {
           }}
         />
       </Modal>
-    </>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -14,7 +15,6 @@ function lockBodyScroll(lock) {
     body.style.right = "0";
     body.style.width = "100%";
     body.style.overflow = "hidden";
-    body.style.touchAction = "none";
   } else {
     const scrollY = Number(body.dataset.scrollLockY || 0);
     body.style.position = "";
@@ -23,7 +23,6 @@ function lockBodyScroll(lock) {
     body.style.right = "";
     body.style.width = "";
     body.style.overflow = "";
-    body.style.touchAction = "";
     delete body.dataset.scrollLockY;
     window.scrollTo(0, scrollY);
   }
@@ -35,11 +34,13 @@ export default function Modal({ open, onClose, title, children }) {
     return () => lockBodyScroll(false);
   }, [open]);
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col justify-end md:items-center md:justify-center md:p-4"
+          className="fixed inset-0 z-[200] flex items-end justify-center md:items-center md:p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -47,41 +48,47 @@ export default function Modal({ open, onClose, title, children }) {
           aria-modal="true"
           aria-labelledby="modal-title"
         >
-          <div
-            className="absolute inset-0 bg-black/70 touch-none"
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/70"
             onClick={onClose}
-            onTouchMove={(e) => e.preventDefault()}
-            aria-hidden
+            aria-label="Close dialog"
           />
           <motion.div
-            className="card-elevated relative z-10 flex max-h-[min(92dvh,100%)] w-full max-w-md flex-col overflow-hidden rounded-t-2xl border border-accent md:max-h-[min(88dvh,720px)] md:rounded-2xl"
-            initial={{ opacity: 0, y: 40 }}
+            className="relative z-10 flex w-full max-w-md flex-col overflow-hidden rounded-t-2xl border border-accent bg-bg-mid shadow-elevated md:max-h-[min(88dvh,720px)] md:rounded-2xl"
+            style={{ maxHeight: "min(92dvh, 100%)" }}
+            initial={{ opacity: 0, y: "100%" }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
+            exit={{ opacity: 0, y: "100%" }}
+            transition={{ type: "tween", duration: 0.22 }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex shrink-0 items-center justify-between border-b border-accent/60 px-4 py-3">
               <h2
                 id="modal-title"
-                className="font-display text-lg font-bold text-white"
+                className="pr-2 font-display text-lg font-bold text-white"
               >
                 {title}
               </h2>
               <button
                 type="button"
                 onClick={onClose}
-                className="-mr-1 rounded-lg p-2 text-text-secondary hover:bg-bg-mid hover:text-white"
+                className="shrink-0 rounded-lg p-2 text-text-secondary hover:bg-bg-deepest hover:text-white"
                 aria-label="Close"
               >
                 <X size={22} />
               </button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-4 [-webkit-overflow-scrolling:touch]">
+            <div
+              className="overflow-y-auto overscroll-y-contain px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]"
+              style={{ maxHeight: "calc(92dvh - 3.25rem)" }}
+            >
               {children}
             </div>
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

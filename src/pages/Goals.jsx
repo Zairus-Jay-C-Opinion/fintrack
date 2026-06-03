@@ -101,10 +101,15 @@ export default function Goals() {
   };
 
   return (
-    <>
+    <div className="min-w-0 max-w-full overflow-x-hidden">
       <TopBar
         title="Goals"
-        subtitle="Save toward targets — fund from savings or unspent spending budget"
+        subtitle="Save toward targets"
+        actions={
+          <Button size="sm" onClick={() => setGoalModal(true)}>
+            Add goal
+          </Button>
+        }
       />
 
       <PageHelp title="How Goals works">
@@ -294,6 +299,6 @@ export default function Goals() {
           <Button type="submit">Save</Button>
         </form>
       </Modal>
-    </>
+    </div>
   );
 }

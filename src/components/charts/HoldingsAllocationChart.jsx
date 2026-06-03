@@ -28,7 +28,8 @@ export default function HoldingsAllocationChart({ holdings }) {
   }
 
   return (
-    <ResponsiveContainer width="100%" height={220}>
+    <div className="min-w-0 w-full">
+    <ResponsiveContainer width="100%" height={200} minWidth={0}>
       <PieChart>
         <Pie
           data={data}
@@ -53,5 +54,6 @@ export default function HoldingsAllocationChart({ holdings }) {
         <Legend />
       </PieChart>
     </ResponsiveContainer>
+    </div>
   );
 }

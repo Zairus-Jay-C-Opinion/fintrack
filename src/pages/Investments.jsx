@@ -102,6 +102,11 @@ export default function Investments() {
       <TopBar
         title="Investments"
         subtitle={`${userProfile.broker} portfolio`}
+        actions={
+          <Button size="sm" onClick={openAdd}>
+            Add purchase
+          </Button>
+        }
       />
 
       <PageHelp title="Understanding Investments">
@@ -151,71 +156,25 @@ export default function Investments() {
         />
       </div>
 
-      {tickers.length > 0 && (
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <div className="card">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="font-display text-lg font-semibold text-white">
-                Price history
-              </h3>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={refreshPrices}
-                disabled={pricesLoading}
-              >
-                {pricesLoading ? "Loading…" : "Refresh live"}
-              </Button>
-            </div>
-            {tickers.length > 1 && (
-              <div className="mt-4">
-                <Tabs
-                  tabs={tickers.map((t) => ({ id: t, label: t }))}
-                  active={chartTicker || tickers[0]}
-                  onChange={setChartTicker}
-                />
-              </div>
-            )}
-            <div className="mt-4">
-              <StockPriceChart
-                ticker={chartTicker || tickers[0]}
-                data={priceHistory[chartTicker || tickers[0]]}
-              />
-            </div>
-            {Object.keys(chartErrors).length > 0 && (
-              <p className="mt-2 text-xs text-warning">
-                Chart unavailable for:{" "}
-                {Object.entries(chartErrors)
-                  .map(([s, m]) => `${s} (${m})`)
-                  .join("; ")}
-              </p>
-            )}
-            <p className="mt-2 text-xs text-text-secondary">
-              Daily closing prices, last ~90 days
-            </p>
-          </div>
-          <div className="card">
-            <h3 className="font-display text-lg font-semibold text-white">
-              Portfolio mix (USD)
-            </h3>
-            <div className="mt-4">
-              <HoldingsAllocationChart holdings={holdings} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-6 grid gap-4 lg:grid-cols-3">
-        <div className="card lg:col-span-2">
+      <div className="mb-4 grid gap-4 lg:grid-cols-3">
+        <div className="card min-w-0 lg:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-display text-lg font-semibold text-white">
               Holdings
             </h3>
-            <Button size="sm" onClick={openAdd}>
+            <Button size="sm" onClick={openAdd} className="hidden sm:inline-flex">
               Add purchase
             </Button>
           </div>
-          <div className="mt-4 -mx-1 overflow-x-auto overscroll-x-contain px-1">
+          {holdings.length === 0 ? (
+            <div className="mt-6 rounded-lg border border-dashed border-accent/80 py-8 text-center">
+              <p className="text-sm text-text-secondary">No purchases yet</p>
+              <Button className="mt-4" onClick={openAdd}>
+                Add purchase
+              </Button>
+            </div>
+          ) : (
+          <div className="mt-4 max-w-full overflow-x-auto overscroll-x-contain">
             <table className="w-full min-w-[520px] text-left text-xs sm:text-sm">
               <thead>
                 <tr className="border-b border-accent text-text-secondary">
@@ -281,9 +240,10 @@ export default function Investments() {
               </tbody>
             </table>
           </div>
+          )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
           <div className="card">
             <h3 className="font-display font-semibold text-white">FX Rate</h3>
             <p className="mt-2 font-mono text-2xl text-white">
@@ -398,11 +358,65 @@ export default function Investments() {
         </div>
       </div>
 
-      <div className="card">
+      {tickers.length > 0 && (
+        <div className="mb-4 grid min-w-0 gap-4 lg:grid-cols-2">
+          <div className="card min-w-0 overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="font-display text-lg font-semibold text-white">
+                Price history
+              </h3>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={refreshPrices}
+                disabled={pricesLoading}
+              >
+                {pricesLoading ? "Loading…" : "Refresh live"}
+              </Button>
+            </div>
+            {tickers.length > 1 && (
+              <div className="mt-4 max-w-full overflow-x-auto">
+                <Tabs
+                  tabs={tickers.map((t) => ({ id: t, label: t }))}
+                  active={chartTicker || tickers[0]}
+                  onChange={setChartTicker}
+                />
+              </div>
+            )}
+            <div className="mt-4 min-w-0">
+              <StockPriceChart
+                ticker={chartTicker || tickers[0]}
+                data={priceHistory[chartTicker || tickers[0]]}
+              />
+            </div>
+            {Object.keys(chartErrors).length > 0 && (
+              <p className="mt-2 text-xs text-warning">
+                Chart unavailable for:{" "}
+                {Object.entries(chartErrors)
+                  .map(([s, m]) => `${s} (${m})`)
+                  .join("; ")}
+              </p>
+            )}
+            <p className="mt-2 text-xs text-text-secondary">
+              Daily closing prices, last ~90 days
+            </p>
+          </div>
+          <div className="card min-w-0 overflow-hidden">
+            <h3 className="font-display text-lg font-semibold text-white">
+              Portfolio mix (USD)
+            </h3>
+            <div className="mt-4 min-w-0">
+              <HoldingsAllocationChart holdings={holdings} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="card min-w-0">
         <h3 className="font-display text-lg font-semibold text-white">
           Purchase history
         </h3>
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 max-w-full overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-accent text-text-secondary">
@@ -484,6 +498,16 @@ export default function Investments() {
           }}
         />
       </Modal>
+
+      {!modalOpen && (
+        <button
+          type="button"
+          onClick={openAdd}
+          className="fixed bottom-[calc(4.25rem+env(safe-area-inset-bottom))] right-4 z-30 rounded-full bg-highlight px-4 py-3 text-sm font-semibold text-white shadow-elevated md:hidden"
+        >
+          + Add purchase
+        </button>
+      )}
 
       <EditHoldingModal
         open={!!editingHolding}
