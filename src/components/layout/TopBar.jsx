@@ -15,11 +15,11 @@ export default function TopBar({ title, subtitle, onMenuClick, actions }) {
             </button>
           )}
           <div className="min-w-0">
-            <h1 className="font-display text-xl font-bold leading-tight text-white sm:text-2xl md:text-3xl">
+            <h1 className="font-display text-2xl font-bold leading-tight text-white md:text-3xl">
               {title}
             </h1>
             {subtitle && (
-              <p className="mt-0.5 line-clamp-2 text-xs text-text-secondary sm:text-sm">
+              <p className="mt-0.5 line-clamp-2 text-sm text-text-secondary md:text-sm">
                 {subtitle}
               </p>
             )}

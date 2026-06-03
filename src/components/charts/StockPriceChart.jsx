@@ -1,4 +1,4 @@
-import { useMemo, useState, useLayoutEffect } from "react";
+import { useMemo, useRef, useState, useLayoutEffect } from "react";
 import {
   LineChart,
   Line,
@@ -32,17 +32,32 @@ function enrichForColoredLine(data) {
 }
 
 export default function StockPriceChart({ data, ticker }) {
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
   const chartData = useMemo(
     () => (data?.length ? enrichForColoredLine(data.map((d) => ({ ...d }))) : []),
     [data]
   );
 
-  const [draw, setDraw] = useState(false);
-
   useLayoutEffect(() => {
-    setDraw(false);
-    const id = requestAnimationFrame(() => setDraw(true));
-    return () => cancelAnimationFrame(id);
+    const el = containerRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const w = el.getBoundingClientRect().width;
+      if (w > 0) setContainerWidth(w);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    const id = requestAnimationFrame(measure);
+
+    return () => {
+      cancelAnimationFrame(id);
+      ro.disconnect();
+    };
   }, [ticker, chartData.length]);
 
   if (!chartData.length) {
@@ -53,13 +68,19 @@ export default function StockPriceChart({ data, ticker }) {
     );
   }
 
-  if (!draw) {
-    return <div className="h-[200px] min-w-0 w-full sm:h-[220px]" aria-hidden />;
+  if (containerWidth < 2) {
+    return (
+      <div
+        ref={containerRef}
+        className="h-[200px] min-w-0 w-full sm:h-[220px]"
+        aria-hidden
+      />
+    );
   }
 
   return (
-    <div className="min-w-0 w-full">
-      <ResponsiveContainer width="100%" height={200} minWidth={1}>
+    <div ref={containerRef} className="min-w-0 w-full">
+      <ResponsiveContainer width={containerWidth} height={200}>
         <LineChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.gridColor} />
           <XAxis

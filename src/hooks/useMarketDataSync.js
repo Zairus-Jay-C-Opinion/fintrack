@@ -1,38 +1,52 @@
 import { useEffect } from "react";
 import { useFinanceStore } from "../store/useFinanceStore";
+import { getChartCache, setChartCache, initChartCache } from "../utils/chartCache";
 
-/** Migrate legacy chart cache + keep ticker in sync app-wide. */
+/** Load chart cache + sync ticker when holdings change. */
 export function useMarketDataSync() {
   const purchases = useFinanceStore((s) => s.investmentPurchases);
-  const setMarketData = useFinanceStore((s) => s.setMarketData);
   const tickers = [...new Set(purchases.map((p) => p.ticker))];
 
   useEffect(() => {
+    initChartCache();
+
+    const legacy = useFinanceStore.getState().marketPriceHistory;
+    const cached = getChartCache();
+    if (
+      Object.keys(cached.priceHistory).length === 0 &&
+      legacy &&
+      Object.keys(legacy).length > 0
+    ) {
+      setChartCache({
+        priceHistory: legacy,
+        chartTicker: useFinanceStore.getState().marketChartTicker || "",
+        lastRefresh: useFinanceStore.getState().marketLastRefresh || null,
+      });
+    }
+
     try {
       const raw = localStorage.getItem("fintrack-market");
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      const legacy = parsed?.state;
-      if (!legacy?.priceHistory || !Object.keys(legacy.priceHistory).length) {
-        return;
+      if (raw && Object.keys(getChartCache().priceHistory).length === 0) {
+        const parsed = JSON.parse(raw);
+        const state = parsed?.state;
+        if (state?.priceHistory && Object.keys(state.priceHistory).length) {
+          setChartCache({
+            priceHistory: state.priceHistory,
+            chartTicker: state.chartTicker || "",
+            lastRefresh: state.lastRefresh || null,
+          });
+        }
       }
-      const current = useFinanceStore.getState().marketPriceHistory;
-      if (Object.keys(current).length > 0) return;
-      setMarketData({
-        marketPriceHistory: legacy.priceHistory,
-        marketChartTicker: legacy.chartTicker || "",
-        marketLastRefresh: legacy.lastRefresh || null,
-      });
     } catch {
       /* ignore */
     }
-  }, [setMarketData]);
+  }, []);
 
   useEffect(() => {
     if (!tickers.length) return;
-    const current = useFinanceStore.getState().marketChartTicker;
+    const current = getChartCache().chartTicker;
     if (!current || !tickers.includes(current)) {
-      setMarketData({ marketChartTicker: tickers[0] });
+      setChartCache({ chartTicker: tickers[0] });
     }
-  }, [tickers.join(","), setMarketData]);
+  }, [tickers.join(",")]);
 }

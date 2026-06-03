@@ -23,7 +23,9 @@ import {
 import { formatPhp, formatUsd, usdToPhp } from "../utils/currency";
 import { formatDate } from "../utils/formatters";
 import { useExchangeRate } from "../hooks/useExchangeRate";
-import { useStockPriceRefresh } from "../hooks/useStockPriceRefresh";
+import { useMarketChart } from "../contexts/MarketChartContext";
+import { useChartCache } from "../hooks/useChartCache";
+import { resolveChartTicker } from "../utils/chartCache";
 import { userProfile } from "../constants/userProfile";
 
 export default function Investments() {
@@ -49,10 +51,9 @@ export default function Investments() {
     quoteErrors,
     chartErrors,
     priceFallbacks,
-    priceHistory,
-    chartTicker,
     setChartTicker,
-  } = useStockPriceRefresh();
+  } = useMarketChart();
+  const { priceHistory, chartTicker } = useChartCache();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPurchase, setEditingPurchase] = useState(null);
@@ -64,8 +65,15 @@ export default function Investments() {
     () => [...new Set(purchases.map((p) => p.ticker))],
     [purchases]
   );
-  const activeChartTicker = chartTicker || tickers[0];
-  const activeChartData = priceHistory[activeChartTicker];
+  const activeChartTicker = resolveChartTicker(
+    tickers,
+    chartTicker,
+    priceHistory
+  );
+  const activeChartData = priceHistory?.[activeChartTicker];
+  const hasChartData =
+    activeChartData?.length > 0 ||
+    Object.values(priceHistory ?? {}).some((pts) => pts?.length > 0);
   const totalInvested = getTotalInvestedUSD(purchases);
   const currentValue = getPortfolioValueUSD(purchases, etfPrices);
   const gain = currentValue - totalInvested;
@@ -351,7 +359,7 @@ export default function Investments() {
       </div>
 
       {tickers.length > 0 && (
-        <div className="mb-4 grid min-w-0 gap-4 lg:grid-cols-2">
+        <div className="mb-4 grid min-w-0 gap-4 lg:grid-cols-2" key="charts-section">
           <div className="card min-w-0 overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="font-display text-lg font-semibold text-white">
@@ -391,7 +399,9 @@ export default function Investments() {
               </p>
             )}
             <p className="mt-2 text-xs text-text-secondary">
-              Daily closing prices, last ~90 days
+              {hasChartData
+                ? "Daily closing prices, last ~90 days"
+                : "Tap Refresh live to load chart data"}
             </p>
           </div>
           <div className="card min-w-0 overflow-hidden">

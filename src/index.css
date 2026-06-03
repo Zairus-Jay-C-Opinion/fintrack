@@ -102,40 +102,6 @@ body {
     appearance: none;
   }
 
-  .allocation-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--color-bg-mid);
-    outline: none;
-  }
-
-  .allocation-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--color-highlight);
-    border: 2px solid var(--color-white);
-    cursor: pointer;
-  }
-
-  .allocation-slider::-moz-range-track {
-    height: 6px;
-    border-radius: 999px;
-    background: var(--color-bg-mid);
-  }
-
-  .allocation-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--color-highlight);
-    border: 2px solid var(--color-white);
-    cursor: pointer;
-  }
 }
 
 @layer components {
@@ -170,4 +136,80 @@ body {
   .font-mono-num {
     font-family: var(--font-mono);
   }
+}
+
+/* Range sliders (Settings allocation) — outside @layer so Tailwind cannot override */
+input[type="range"].allocation-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  margin: 10px 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  color-scheme: dark;
+  accent-color: #5b8fa8;
+}
+
+input[type="range"].allocation-slider:focus {
+  outline: none;
+}
+
+input[type="range"].allocation-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #253745;
+  border: 1px solid #4a5c6a;
+}
+
+input[type="range"].allocation-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: #5b8fa8;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+input[type="range"].allocation-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #253745;
+  border: 1px solid #4a5c6a;
+}
+
+input[type="range"].allocation-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5b8fa8;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+input[type="range"].allocation-slider::-ms-track {
+  height: 8px;
+  border-radius: 999px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type="range"].allocation-slider::-ms-fill-lower,
+input[type="range"].allocation-slider::-ms-fill-upper {
+  background: #253745;
+  border-radius: 999px;
+}
+
+input[type="range"].allocation-slider::-ms-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5b8fa8;
+  border: 2px solid #ffffff;
 }

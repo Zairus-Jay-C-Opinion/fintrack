@@ -3,7 +3,18 @@ import Button from "../ui/Button";
 import { formatPercent } from "../../utils/formatters";
 
 const KEYS = ["investments", "savings", "spending"];
-const LABELS = { investments: "Investments", savings: "Savings", spending: "Spending" };
+const LABELS = {
+  investments: "Investments",
+  savings: "Savings",
+  spending: "Spending",
+};
+
+function sliderTrackStyle(percent) {
+  const p = Math.min(100, Math.max(0, percent));
+  return {
+    background: `linear-gradient(to right, #5b8fa8 0%, #5b8fa8 ${p}%, #253745 ${p}%, #253745 100%)`,
+  };
+}
 
 export default function AllocationEditor({ allocation, onSave }) {
   const [local, setLocal] = useState({
@@ -48,9 +59,11 @@ export default function AllocationEditor({ allocation, onSave }) {
             type="range"
             min="0"
             max="100"
+            step="1"
             value={local[key]}
             onChange={(e) => handleChange(key, e.target.value)}
             className="allocation-slider w-full"
+            style={sliderTrackStyle(local[key])}
           />
         </div>
       ))}
