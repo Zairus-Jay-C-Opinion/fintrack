@@ -19,6 +19,12 @@ export const useFinanceStore = create(
 
       transactions: [],
 
+      marketPriceHistory: {},
+      marketChartTicker: "",
+      marketLastRefresh: null,
+
+      setMarketData: (patch) => set((state) => ({ ...state, ...patch })),
+
       addSavingsEntry: (entry) =>
         set((state) => {
           const savingsEntries = [entry, ...state.savingsEntries];
@@ -147,6 +153,9 @@ export const useFinanceStore = create(
           investmentPurchases: [],
           etfPrices: { ...defaultEtfPrices },
           transactions: [],
+          marketPriceHistory: {},
+          marketChartTicker: "",
+          marketLastRefresh: null,
         }),
 
       exportData: () => {
@@ -162,6 +171,9 @@ export const useFinanceStore = create(
             investmentPurchases: state.investmentPurchases,
             etfPrices: state.etfPrices,
             transactions: state.transactions,
+            marketPriceHistory: state.marketPriceHistory,
+            marketChartTicker: state.marketChartTicker,
+            marketLastRefresh: state.marketLastRefresh,
           },
           null,
           2
@@ -180,6 +192,9 @@ export const useFinanceStore = create(
           investmentPurchases: data.investmentPurchases ?? [],
           etfPrices: data.etfPrices ?? { ...defaultEtfPrices },
           transactions: data.transactions ?? [],
+          marketPriceHistory: data.marketPriceHistory ?? {},
+          marketChartTicker: data.marketChartTicker ?? "",
+          marketLastRefresh: data.marketLastRefresh ?? null,
         });
       },
     }),

@@ -50,7 +50,7 @@ export default function AllocationEditor({ allocation, onSave }) {
             max="100"
             value={local[key]}
             onChange={(e) => handleChange(key, e.target.value)}
-            className="w-full accent-highlight"
+            className="allocation-slider w-full"
           />
         </div>
       ))}

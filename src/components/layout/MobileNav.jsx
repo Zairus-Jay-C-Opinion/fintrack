@@ -5,15 +5,16 @@ import {
   TrendingUp,
   Receipt,
   Target,
-  Settings,
+  LayoutGrid,
 } from "lucide-react";
 
 const items = [
   { to: "/", icon: LayoutDashboard, label: "Home" },
   { to: "/expenses", icon: Receipt, label: "Spend" },
+  { to: "/savings", icon: PiggyBank, label: "Save" },
   { to: "/goals", icon: Target, label: "Goals" },
   { to: "/investments", icon: TrendingUp, label: "Invest" },
-  { to: "/settings", icon: Settings, label: "Settings" },
+  { to: "/more", icon: LayoutGrid, label: "More" },
 ];
 
 export default function MobileNav() {
@@ -25,13 +26,13 @@ export default function MobileNav() {
           to={to}
           end={to === "/"}
           className={({ isActive }) =>
-            `flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[11px] ${
+            `flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] ${
               isActive ? "text-highlight" : "text-text-secondary"
             }`
           }
         >
-          <Icon size={20} />
-          <span>{label}</span>
+          <Icon size={18} />
+          <span className="leading-tight">{label}</span>
         </NavLink>
       ))}
     </nav>

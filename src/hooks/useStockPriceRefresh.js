@@ -1,6 +1,5 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useFinanceStore } from "../store/useFinanceStore";
-import { useMarketStore } from "../store/useMarketStore";
 import {
   fetchMultipleQuotes,
   fetchMultipleCandles,
@@ -14,28 +13,29 @@ function lastClose(points) {
 export function useStockPriceRefresh() {
   const purchases = useFinanceStore((s) => s.investmentPurchases);
   const updateEtfPrice = useFinanceStore((s) => s.updateEtfPrice);
+  const priceHistory = useFinanceStore((s) => s.marketPriceHistory);
+  const chartTicker = useFinanceStore((s) => s.marketChartTicker);
+  const lastRefresh = useFinanceStore((s) => s.marketLastRefresh);
+  const setMarketData = useFinanceStore((s) => s.setMarketData);
 
-  const priceHistory = useMarketStore((s) => s.priceHistory);
-  const chartTicker = useMarketStore((s) => s.chartTicker);
-  const lastRefresh = useMarketStore((s) => s.lastRefresh);
-  const quoteErrors = useMarketStore((s) => s.quoteErrors);
-  const chartErrors = useMarketStore((s) => s.chartErrors);
-  const priceFallbacks = useMarketStore((s) => s.priceFallbacks);
-  const loading = useMarketStore((s) => s.loading);
-  const setMarket = useMarketStore((s) => s.setMarket);
-  const clearMarketMessages = useMarketStore((s) => s.clearMarketMessages);
+  const [loading, setLoading] = useState(false);
+  const [quoteErrors, setQuoteErrors] = useState({});
+  const [chartErrors, setChartErrors] = useState({});
+  const [priceFallbacks, setPriceFallbacks] = useState({});
 
   const tickers = [...new Set(purchases.map((p) => p.ticker))];
 
   const setChartTicker = useCallback(
-    (ticker) => setMarket({ chartTicker: ticker }),
-    [setMarket]
+    (ticker) => setMarketData({ marketChartTicker: ticker }),
+    [setMarketData]
   );
 
   const refreshPrices = useCallback(async () => {
     if (tickers.length === 0) return;
-    setMarket({ loading: true });
-    clearMarketMessages();
+    setLoading(true);
+    setQuoteErrors({});
+    setChartErrors({});
+    setPriceFallbacks({});
 
     try {
       const { history, errors: cErr } = await fetchMultipleCandles(tickers, 90);
@@ -58,28 +58,26 @@ export function useStockPriceRefresh() {
         }
       }
 
-      const currentTicker = useMarketStore.getState().chartTicker;
+      const currentTicker = useFinanceStore.getState().marketChartTicker;
       const nextTicker =
         currentTicker && tickers.includes(currentTicker)
           ? currentTicker
           : tickers[0];
 
-      setMarket({
-        priceHistory: history,
-        chartErrors: cErr,
-        quoteErrors: remainingQuoteErrors,
-        priceFallbacks: fallbacks,
-        chartTicker: nextTicker,
-        lastRefresh: new Date().toISOString(),
-        loading: false,
+      setMarketData({
+        marketPriceHistory: history,
+        marketChartTicker: nextTicker,
+        marketLastRefresh: new Date().toISOString(),
       });
+      setChartErrors(cErr);
+      setQuoteErrors(remainingQuoteErrors);
+      setPriceFallbacks(fallbacks);
     } catch (e) {
-      setMarket({
-        quoteErrors: { _: e.message },
-        loading: false,
-      });
+      setQuoteErrors({ _: e.message });
+    } finally {
+      setLoading(false);
     }
-  }, [tickers.join(","), updateEtfPrice, setMarket, clearMarketMessages]);
+  }, [tickers.join(","), updateEtfPrice, setMarketData]);
 
   const lastRefreshDate = lastRefresh ? new Date(lastRefresh) : null;
 

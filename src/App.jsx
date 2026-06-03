@@ -11,6 +11,7 @@ import Investments from "./pages/Investments";
 import Forecasting from "./pages/Forecasting";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
+import More from "./pages/More";
 import { useNotifications } from "./hooks/useNotifications";
 import { useMarketDataSync } from "./hooks/useMarketDataSync";
 
@@ -32,6 +33,7 @@ function AppRoutes() {
             <Route path="/investments" element={<Investments />} />
             <Route path="/forecasting" element={<Forecasting />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/more" element={<More />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </PageWrapper>

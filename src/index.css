@@ -101,6 +101,41 @@ body {
     -webkit-appearance: none;
     appearance: none;
   }
+
+  .allocation-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-bg-mid);
+    outline: none;
+  }
+
+  .allocation-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-highlight);
+    border: 2px solid var(--color-white);
+    cursor: pointer;
+  }
+
+  .allocation-slider::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-bg-mid);
+  }
+
+  .allocation-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-highlight);
+    border: 2px solid var(--color-white);
+    cursor: pointer;
+  }
 }
 
 @layer components {
