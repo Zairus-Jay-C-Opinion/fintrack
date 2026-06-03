@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useFinanceStore } from "../store/useFinanceStore";
 import { useMarketStore } from "../store/useMarketStore";
 import {
@@ -70,7 +70,7 @@ export function useStockPriceRefresh() {
         quoteErrors: remainingQuoteErrors,
         priceFallbacks: fallbacks,
         chartTicker: nextTicker,
-        lastRefresh: new Date(),
+        lastRefresh: new Date().toISOString(),
         loading: false,
       });
     } catch (e) {
@@ -81,18 +81,12 @@ export function useStockPriceRefresh() {
     }
   }, [tickers.join(","), updateEtfPrice, setMarket, clearMarketMessages]);
 
-  useEffect(() => {
-    if (!tickers.length) return;
-    const current = useMarketStore.getState().chartTicker;
-    if (!current || !tickers.includes(current)) {
-      setMarket({ chartTicker: tickers[0] });
-    }
-  }, [tickers.join(","), setMarket]);
+  const lastRefreshDate = lastRefresh ? new Date(lastRefresh) : null;
 
   return {
     refreshPrices,
     loading,
-    lastRefresh,
+    lastRefresh: lastRefreshDate,
     quoteErrors,
     chartErrors,
     priceFallbacks,

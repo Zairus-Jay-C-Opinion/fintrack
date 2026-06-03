@@ -12,9 +12,11 @@ import Forecasting from "./pages/Forecasting";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import { useNotifications } from "./hooks/useNotifications";
+import { useMarketDataSync } from "./hooks/useMarketDataSync";
 
 function AppRoutes() {
   useNotifications();
+  useMarketDataSync();
   const [sidebarCollapsed] = useState(false);
 
   return (

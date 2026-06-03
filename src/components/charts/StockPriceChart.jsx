@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useLayoutEffect } from "react";
 import {
   LineChart,
   Line,
@@ -37,6 +37,14 @@ export default function StockPriceChart({ data, ticker }) {
     [data]
   );
 
+  const [draw, setDraw] = useState(false);
+
+  useLayoutEffect(() => {
+    setDraw(false);
+    const id = requestAnimationFrame(() => setDraw(true));
+    return () => cancelAnimationFrame(id);
+  }, [ticker, chartData.length]);
+
   if (!chartData.length) {
     return (
       <div className="flex h-[200px] min-w-0 items-center justify-center text-sm text-text-secondary sm:h-[220px]">
@@ -45,9 +53,13 @@ export default function StockPriceChart({ data, ticker }) {
     );
   }
 
+  if (!draw) {
+    return <div className="h-[200px] min-w-0 w-full sm:h-[220px]" aria-hidden />;
+  }
+
   return (
     <div className="min-w-0 w-full">
-      <ResponsiveContainer width="100%" height={200} minWidth={0}>
+      <ResponsiveContainer width="100%" height={200} minWidth={1}>
         <LineChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.gridColor} />
           <XAxis
@@ -81,7 +93,6 @@ export default function StockPriceChart({ data, ticker }) {
             strokeWidth={2.5}
             dot={false}
             connectNulls={false}
-            animationDuration={600}
             isAnimationActive={false}
           />
           <Line
@@ -91,7 +102,6 @@ export default function StockPriceChart({ data, ticker }) {
             strokeWidth={2.5}
             dot={false}
             connectNulls={false}
-            animationDuration={600}
             isAnimationActive={false}
           />
         </LineChart>

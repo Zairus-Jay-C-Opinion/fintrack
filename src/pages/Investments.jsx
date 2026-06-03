@@ -64,6 +64,8 @@ export default function Investments() {
     () => [...new Set(purchases.map((p) => p.ticker))],
     [purchases]
   );
+  const activeChartTicker = chartTicker || tickers[0];
+  const activeChartData = priceHistory[activeChartTicker];
   const totalInvested = getTotalInvestedUSD(purchases);
   const currentValue = getPortfolioValueUSD(purchases, etfPrices);
   const gain = currentValue - totalInvested;
@@ -368,15 +370,16 @@ export default function Investments() {
               <div className="mt-4 max-w-full overflow-x-auto">
                 <Tabs
                   tabs={tickers.map((t) => ({ id: t, label: t }))}
-                  active={chartTicker || tickers[0]}
+                  active={activeChartTicker}
                   onChange={setChartTicker}
                 />
               </div>
             )}
-            <div className="mt-4 min-w-0">
+            <div className="mt-4 min-w-0 w-full">
               <StockPriceChart
-                ticker={chartTicker || tickers[0]}
-                data={priceHistory[chartTicker || tickers[0]]}
+                key={`${activeChartTicker}-${activeChartData?.length ?? 0}`}
+                ticker={activeChartTicker}
+                data={activeChartData}
               />
             </div>
             {Object.keys(chartErrors).length > 0 && (
