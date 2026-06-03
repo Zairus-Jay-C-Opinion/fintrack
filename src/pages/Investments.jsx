@@ -1,0 +1,496 @@
+import { useState, useMemo } from "react";
+import { Pencil, Trash2 } from "lucide-react";
+import TopBar from "../components/layout/TopBar";
+import PageHelp from "../components/ui/PageHelp";
+import Tabs from "../components/ui/Tabs";
+import StockPriceChart from "../components/charts/StockPriceChart";
+import HoldingsAllocationChart from "../components/charts/HoldingsAllocationChart";
+import StatCard from "../components/cards/StatCard";
+import Button from "../components/ui/Button";
+import Modal from "../components/ui/Modal";
+import Input from "../components/ui/Input";
+import AddInvestmentForm from "../components/forms/AddInvestmentForm";
+import EditHoldingModal from "../components/forms/EditHoldingModal";
+import { useFinanceStore } from "../store/useFinanceStore";
+import { useSettingsStore } from "../store/useSettingsStore";
+import {
+  getHoldingsSummary,
+  getTotalInvestedUSD,
+  getPortfolioValueUSD,
+  getNextPayday,
+  daysUntil,
+} from "../utils/finance";
+import { formatPhp, formatUsd, usdToPhp } from "../utils/currency";
+import { formatDate } from "../utils/formatters";
+import { useExchangeRate } from "../hooks/useExchangeRate";
+import { useStockPriceRefresh } from "../hooks/useStockPriceRefresh";
+import { userProfile } from "../constants/userProfile";
+
+export default function Investments() {
+  const purchases = useFinanceStore((s) => s.investmentPurchases);
+  const etfPrices = useFinanceStore((s) => s.etfPrices);
+  const addInvestmentPurchase = useFinanceStore((s) => s.addInvestmentPurchase);
+  const updateInvestmentPurchase = useFinanceStore(
+    (s) => s.updateInvestmentPurchase
+  );
+  const removeInvestmentPurchase = useFinanceStore(
+    (s) => s.removeInvestmentPurchase
+  );
+  const updateEtfPrice = useFinanceStore((s) => s.updateEtfPrice);
+  const phpUsdRate = useSettingsStore((s) => s.phpUsdRate);
+  const monthlyIncome = useSettingsStore((s) => s.monthlyIncome);
+  const allocation = useSettingsStore((s) => s.allocation);
+  const paydays = useSettingsStore((s) => s.paydays);
+  const { fetchLiveRate, loading: fxLoading } = useExchangeRate();
+  const {
+    refreshPrices,
+    loading: pricesLoading,
+    lastRefresh,
+    quoteErrors,
+    chartErrors,
+    priceHistory,
+    chartTicker,
+    setChartTicker,
+  } = useStockPriceRefresh();
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingPurchase, setEditingPurchase] = useState(null);
+  const [editingHolding, setEditingHolding] = useState(null);
+  const [priceEdits, setPriceEdits] = useState({});
+
+  const holdings = getHoldingsSummary(purchases, etfPrices);
+  const tickers = useMemo(
+    () => [...new Set(purchases.map((p) => p.ticker))],
+    [purchases]
+  );
+  const totalInvested = getTotalInvestedUSD(purchases);
+  const currentValue = getPortfolioValueUSD(purchases, etfPrices);
+  const gain = currentValue - totalInvested;
+  const gainPct = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
+  const dcaAmount = monthlyIncome * allocation.investments;
+  const nextPayday = getNextPayday(paydays);
+
+  const openAdd = () => {
+    setEditingPurchase(null);
+    setModalOpen(true);
+  };
+
+  const openEdit = (purchase) => {
+    setEditingPurchase(purchase);
+    setModalOpen(true);
+  };
+
+  const handleSubmit = (purchase) => {
+    if (editingPurchase) {
+      updateInvestmentPurchase(editingPurchase.id, purchase);
+    } else {
+      addInvestmentPurchase(purchase);
+    }
+    setModalOpen(false);
+    setEditingPurchase(null);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Delete this purchase record?")) {
+      removeInvestmentPurchase(id);
+    }
+  };
+
+  return (
+    <>
+      <TopBar
+        title="Investments"
+        subtitle={`${userProfile.broker} portfolio — stocks, ETFs, and more`}
+      />
+
+      <PageHelp title="Understanding Investments">
+        <ul className="list-inside list-disc space-y-2">
+          <li>
+            <strong className="text-text-primary">Unrealized P/L</strong> (profit/loss)
+            — paper gain or loss if you sold today. Current value minus what you
+            paid. Not taxed or realized until you sell.
+          </li>
+          <li>
+            <strong className="text-text-primary">Monthly DCA</strong> — Dollar-Cost
+            Averaging: the amount from your allocation (
+            {(allocation.investments * 100).toFixed(0)}% = {formatPhp(dcaAmount)})
+            you plan to invest each payday.
+          </li>
+          <li>
+            <strong className="text-text-primary">Live prices & charts</strong> — click{" "}
+            <em>Refresh live</em> pulls the latest quote and ~90-day price chart for
+            each symbol.
+          </li>
+        </ul>
+      </PageHelp>
+
+      {lastRefresh && (
+        <p className="mb-4 text-xs text-text-secondary">
+          Market data last updated {lastRefresh.toLocaleString()}
+        </p>
+      )}
+
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Total Invested" value={formatUsd(totalInvested)} sub="What you paid" />
+        <StatCard
+          label="Current Value"
+          value={formatUsd(currentValue)}
+          sub={formatPhp(usdToPhp(currentValue, phpUsdRate))}
+        />
+        <StatCard
+          label="Unrealized P/L"
+          value={formatUsd(gain)}
+          trend={gainPct}
+          sub="Paper gain/loss if sold today"
+        />
+        <StatCard
+          label="Monthly DCA"
+          value={formatPhp(dcaAmount)}
+          sub="Planned investment per month"
+        />
+      </div>
+
+      {tickers.length > 0 && (
+        <div className="mb-6 grid gap-4 lg:grid-cols-2">
+          <div className="card">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="font-display text-lg font-semibold text-white">
+                Price history
+              </h3>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={refreshPrices}
+                disabled={pricesLoading}
+              >
+                {pricesLoading ? "Loading…" : "Refresh live"}
+              </Button>
+            </div>
+            {tickers.length > 1 && (
+              <div className="mt-4">
+                <Tabs
+                  tabs={tickers.map((t) => ({ id: t, label: t }))}
+                  active={chartTicker || tickers[0]}
+                  onChange={setChartTicker}
+                />
+              </div>
+            )}
+            <div className="mt-4">
+              <StockPriceChart
+                ticker={chartTicker || tickers[0]}
+                data={priceHistory[chartTicker || tickers[0]]}
+              />
+            </div>
+            {Object.keys(chartErrors).length > 0 && (
+              <p className="mt-2 text-xs text-warning">
+                Chart unavailable for:{" "}
+                {Object.entries(chartErrors)
+                  .map(([s, m]) => `${s} (${m})`)
+                  .join("; ")}
+              </p>
+            )}
+            <p className="mt-2 text-xs text-text-secondary">
+              Daily closing prices, last ~90 days
+            </p>
+          </div>
+          <div className="card">
+            <h3 className="font-display text-lg font-semibold text-white">
+              Portfolio mix (USD)
+            </h3>
+            <div className="mt-4">
+              <HoldingsAllocationChart holdings={holdings} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-6 grid gap-4 lg:grid-cols-3">
+        <div className="card lg:col-span-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-lg font-semibold text-white">
+              Holdings
+            </h3>
+            <Button size="sm" onClick={openAdd}>
+              Add purchase
+            </Button>
+          </div>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-accent text-text-secondary">
+                  <th className="pb-2 pr-3">Symbol</th>
+                  <th className="pb-2 pr-3">Type</th>
+                  <th className="pb-2 pr-3">Shares</th>
+                  <th className="pb-2 pr-3">Avg cost</th>
+                  <th className="pb-2 pr-3">Price</th>
+                  <th className="pb-2 pr-3">Value</th>
+                  <th className="pb-2 pr-3">Gain</th>
+                  <th className="pb-2 w-16" />
+                </tr>
+              </thead>
+              <tbody>
+                {holdings.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-4 text-text-secondary">
+                      No purchases recorded
+                    </td>
+                  </tr>
+                ) : (
+                  holdings.map((h) => (
+                    <tr key={h.ticker} className="border-b border-accent/50">
+                      <td className="py-3 pr-3 font-medium text-white">
+                        {h.ticker}
+                      </td>
+                      <td className="py-3 pr-3 text-text-secondary">
+                        {h.assetType}
+                      </td>
+                      <td className="py-3 pr-3 font-mono">
+                        {h.shares.toFixed(4)}
+                      </td>
+                      <td className="py-3 pr-3 font-mono">
+                        {formatUsd(h.avgCost)}
+                      </td>
+                      <td className="py-3 pr-3 font-mono">
+                        {formatUsd(h.currentPrice)}
+                      </td>
+                      <td className="py-3 pr-3 font-mono text-white">
+                        {formatUsd(h.currentValue)}
+                        <span className="block text-xs text-text-secondary">
+                          {formatPhp(usdToPhp(h.currentValue, phpUsdRate))}
+                        </span>
+                      </td>
+                      <td
+                        className={`py-3 pr-3 font-mono ${h.gain >= 0 ? "text-gain" : "text-loss"}`}
+                      >
+                        {formatUsd(h.gain)} ({h.gainPct.toFixed(1)}%)
+                      </td>
+                      <td className="py-3">
+                        <button
+                          type="button"
+                          onClick={() => setEditingHolding(h)}
+                          className="rounded p-1 text-text-secondary hover:bg-bg-mid hover:text-white"
+                          title="Edit holding"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="card">
+            <h3 className="font-display font-semibold text-white">FX Rate</h3>
+            <p className="mt-2 font-mono text-2xl text-white">
+              ₱{phpUsdRate.toFixed(2)} / USD
+            </p>
+            <div className="mt-3 flex gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={fetchLiveRate}
+                disabled={fxLoading}
+              >
+                {fxLoading ? "Fetching…" : "Fetch live"}
+              </Button>
+            </div>
+          </div>
+          <div className="card">
+            <h3 className="font-display font-semibold text-white">DCA Tracker</h3>
+            <p className="mt-2 text-sm text-text-secondary">
+              Next contribution in {daysUntil(nextPayday) ?? "—"} days
+            </p>
+            <p className="mt-2 font-mono text-lg text-highlight">
+              {formatPhp(dcaAmount)} recommended
+            </p>
+          </div>
+          <div className="card">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h3 className="font-display font-semibold text-white">
+                Current prices (USD)
+              </h3>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={refreshPrices}
+                disabled={pricesLoading || tickers.length === 0}
+              >
+                {pricesLoading ? "Updating…" : "Refresh live"}
+              </Button>
+            </div>
+            {lastRefresh && (
+              <p className="mb-2 text-xs text-text-secondary">
+                Last updated {lastRefresh.toLocaleTimeString()}
+              </p>
+            )}
+            {Object.keys(quoteErrors).filter((k) => k !== "_").length > 0 && (
+              <div className="mb-2 rounded-[var(--radius-sm)] border border-warning/40 bg-warning/10 p-2 text-xs text-warning">
+                <p className="font-medium">Live price could not load:</p>
+                <ul className="mt-1 list-inside list-disc">
+                  {Object.entries(quoteErrors)
+                    .filter(([k]) => k !== "_")
+                    .map(([symbol, msg]) => (
+                      <li key={symbol}>
+                        <span className="font-mono text-white">{symbol}</span>:{" "}
+                        {msg}
+                      </li>
+                    ))}
+                </ul>
+                <p className="mt-2 text-text-secondary">
+                  Check the ticker (e.g. VOO), wait a minute if rate-limited, or
+                  set the price manually below. On deploy, ensure{" "}
+                  <span className="font-mono">FINNHUB_API_KEY</span> is set on the
+                  host.
+                </p>
+              </div>
+            )}
+            {quoteErrors._ && (
+              <p className="mb-2 text-xs text-loss">{quoteErrors._}</p>
+            )}
+            {tickers.length === 0 ? (
+              <p className="text-sm text-text-secondary">
+                Add a purchase to set prices
+              </p>
+            ) : (
+              tickers.map((ticker) => (
+                <div key={ticker} className="mb-2 flex gap-2">
+                  <Input
+                    label={ticker}
+                    type="number"
+                    value={priceEdits[ticker] ?? etfPrices[ticker] ?? ""}
+                    onChange={(e) =>
+                      setPriceEdits({ ...priceEdits, [ticker]: e.target.value })
+                    }
+                  />
+                  <Button
+                    size="sm"
+                    className="mt-6"
+                    onClick={() =>
+                      updateEtfPrice(
+                        ticker,
+                        parseFloat(priceEdits[ticker]) || etfPrices[ticker]
+                      )
+                    }
+                  >
+                    Set
+                  </Button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <h3 className="font-display text-lg font-semibold text-white">
+          Purchase history
+        </h3>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-accent text-text-secondary">
+                <th className="pb-2 pr-3">Date</th>
+                <th className="pb-2 pr-3">Symbol</th>
+                <th className="pb-2 pr-3">Type</th>
+                <th className="pb-2 pr-3">Shares</th>
+                <th className="pb-2 pr-3">Total USD</th>
+                <th className="pb-2 pr-3">Note</th>
+                <th className="pb-2 w-20" />
+              </tr>
+            </thead>
+            <tbody>
+              {purchases.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-4 text-text-secondary">
+                    No purchases yet
+                  </td>
+                </tr>
+              ) : (
+                purchases.map((p) => (
+                  <tr key={p.id} className="border-b border-accent/50">
+                    <td className="py-3 pr-3">{formatDate(p.date)}</td>
+                    <td className="py-3 pr-3 font-medium text-white">
+                      {p.ticker}
+                    </td>
+                    <td className="py-3 pr-3 text-text-secondary">
+                      {p.assetType || "—"}
+                    </td>
+                    <td className="py-3 pr-3 font-mono">{p.shares}</td>
+                    <td className="py-3 pr-3 font-mono">
+                      {formatUsd(p.totalUSD)}
+                    </td>
+                    <td className="py-3 pr-3 text-text-secondary">{p.note}</td>
+                    <td className="py-3">
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => openEdit(p)}
+                          className="rounded p-1 text-text-secondary hover:bg-bg-mid hover:text-white"
+                          title="Edit"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(p.id)}
+                          className="rounded p-1 text-text-secondary hover:bg-bg-mid hover:text-loss"
+                          title="Delete"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <Modal
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditingPurchase(null);
+        }}
+        title={editingPurchase ? "Edit purchase" : "Add purchase"}
+      >
+        <AddInvestmentForm
+          key={editingPurchase?.id ?? "new"}
+          initialData={editingPurchase}
+          submitLabel={editingPurchase ? "Save changes" : "Record purchase"}
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setModalOpen(false);
+            setEditingPurchase(null);
+          }}
+        />
+      </Modal>
+
+      <EditHoldingModal
+        open={!!editingHolding}
+        onClose={() => setEditingHolding(null)}
+        holding={editingHolding}
+        purchases={purchases}
+        etfPrices={etfPrices}
+        onUpdatePrice={(ticker, price) => {
+          updateEtfPrice(ticker, price);
+        }}
+        onEditPurchase={(p) => {
+          setEditingHolding(null);
+          openEdit(p);
+        }}
+        onDeletePurchase={(id) => {
+          if (window.confirm("Delete this purchase lot?")) {
+            removeInvestmentPurchase(id);
+          }
+        }}
+      />
+    </>
+  );
+}

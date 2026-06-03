@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-deepest: #06141b;
+  --color-bg-dark: #11212d;
+  --color-bg-mid: #253745;
+  --color-accent-muted: #4a5c6a;
+  --color-text-secondary: #9ba8ab;
+  --color-text-primary: #ccd0cf;
+  --color-white: #ffffff;
+  --color-gain: #4caf7d;
+  --color-loss: #e05c5c;
+  --color-highlight: #5b8fa8;
+  --color-warning: #d4a843;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.6);
+
+  --font-display: "Syne", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg-deepest);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+@layer components {
+  .card {
+    background: var(--color-bg-dark);
+    border: 1px solid var(--color-accent-muted);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .card {
+      padding: 24px;
+    }
+  }
+
+  .card-elevated {
+    background: var(--color-bg-mid);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-elevated);
+    padding: 24px;
+  }
+
+  .font-mono-num {
+    font-family: var(--font-mono);
+  }
+}

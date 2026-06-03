@@ -1,0 +1,76 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import { defaultAllocation, userProfile } from "../constants/userProfile";
+
+export const useSettingsStore = create(
+  persist(
+    (set) => ({
+      allocation: { ...defaultAllocation },
+      monthlyIncome: userProfile.monthlyIncome,
+      paydays: [...userProfile.paydays],
+      phpUsdRate: 56.5,
+      showUsd: true,
+      showPhp: true,
+      savingsBank: userProfile.bankAccount,
+      savingsBankCustom: "",
+      notificationsEnabled: false,
+      notifyMarketOpen: true,
+      notifyPayday: true,
+      lastMarketNotifyDate: "",
+      lastPaydayNotifyDate: "",
+      finnhubApiKey: "",
+      autoRefreshStockPrices: false,
+      stockRefreshMinutes: 15,
+      marketNotifyHour: 22,
+      marketNotifyMinute: 30,
+      paydayNotifyHourStart: 7,
+      paydayNotifyHourEnd: 10,
+
+      updateAllocation: (alloc) => set({ allocation: alloc }),
+      setSavingsBank: (bank) => set({ savingsBank: bank }),
+      setSavingsBankCustom: (name) => set({ savingsBankCustom: name }),
+      setMonthlyIncome: (amount) => set({ monthlyIncome: amount }),
+      setPaydays: (paydays) => set({ paydays }),
+      updatePhpUsdRate: (rate) => set({ phpUsdRate: rate }),
+      setShowUsd: (show) => set({ showUsd: show }),
+      setShowPhp: (show) => set({ showPhp: show }),
+      setNotificationsEnabled: (v) => set({ notificationsEnabled: v }),
+      setNotifyMarketOpen: (v) => set({ notifyMarketOpen: v }),
+      setNotifyPayday: (v) => set({ notifyPayday: v }),
+      setLastMarketNotifyDate: (d) => set({ lastMarketNotifyDate: d }),
+      setLastPaydayNotifyDate: (d) => set({ lastPaydayNotifyDate: d }),
+      setFinnhubApiKey: (key) => set({ finnhubApiKey: key }),
+      setAutoRefreshStockPrices: (v) => set({ autoRefreshStockPrices: v }),
+      setStockRefreshMinutes: (m) => set({ stockRefreshMinutes: m }),
+      setMarketNotifyHour: (h) => set({ marketNotifyHour: h }),
+      setMarketNotifyMinute: (m) => set({ marketNotifyMinute: m }),
+      setPaydayNotifyHourStart: (h) => set({ paydayNotifyHourStart: h }),
+      setPaydayNotifyHourEnd: (h) => set({ paydayNotifyHourEnd: h }),
+
+      resetSettings: () =>
+        set({
+          allocation: { ...defaultAllocation },
+          monthlyIncome: userProfile.monthlyIncome,
+          paydays: [...userProfile.paydays],
+          phpUsdRate: 56.5,
+          showUsd: true,
+          showPhp: true,
+          savingsBank: userProfile.bankAccount,
+          savingsBankCustom: "",
+          notificationsEnabled: false,
+          notifyMarketOpen: true,
+          notifyPayday: true,
+          lastMarketNotifyDate: "",
+          lastPaydayNotifyDate: "",
+          finnhubApiKey: "",
+          autoRefreshStockPrices: false,
+          stockRefreshMinutes: 15,
+          marketNotifyHour: 22,
+          marketNotifyMinute: 30,
+          paydayNotifyHourStart: 7,
+          paydayNotifyHourEnd: 10,
+        }),
+    }),
+    { name: "fintrack-settings" }
+  )
+);
