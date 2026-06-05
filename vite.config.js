@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 import { fetchQuote, fetchChartHistory } from "./server/marketApi.js";
 
 function marketApiDevPlugin(finnhubKey) {
@@ -65,6 +66,38 @@ export default defineConfig(({ mode }) => {
   const finnhubKey = (env.FINNHUB_API_KEY || env.VITE_FINNHUB_API_KEY || "").trim();
 
   return {
-    plugins: [react(), marketApiDevPlugin(finnhubKey)],
+    plugins: [
+      react(),
+      marketApiDevPlugin(finnhubKey),
+      VitePWA({
+        registerType: "autoUpdate",
+        manifest: {
+          name: "FinTrack",
+          short_name: "FinTrack",
+          description: "Your personal financial dashboard",
+          theme_color: "#06141b",
+          background_color: "#06141b",
+          display: "standalone",
+          icons: [
+            {
+              src: "icon.png",
+              sizes: "192x192",
+              type: "image/png",
+            },
+            {
+              src: "icon.png",
+              sizes: "512x512",
+              type: "image/png",
+            },
+            {
+              src: "icon.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any maskable",
+            },
+          ],
+        },
+      }),
+    ],
   };
 });
