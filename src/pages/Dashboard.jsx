@@ -5,6 +5,7 @@ import AllocationCard from "../components/cards/AllocationCard";
 import NetWorthCard from "../components/cards/NetWorthCard";
 import MonthlyBarChart from "../components/charts/MonthlyBarChart";
 import PortfolioGrowthChart from "../components/charts/PortfolioGrowthChart";
+import AIFinancialAdvisorCard from "../components/cards/AIFinancialAdvisorCard";
 import { useNetWorth } from "../hooks/useNetWorth";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { useFinanceStore } from "../store/useFinanceStore";
@@ -100,6 +101,17 @@ export default function Dashboard() {
           label="Investment Value"
           value={formatPhp(investmentPhp)}
           sub="PHP equivalent"
+        />
+      </div>
+
+      <div className="mb-6">
+        <AIFinancialAdvisorCard
+          netWorth={netWorth}
+          cashOnHand={cashOnHand}
+          savingsBalance={savingsBalance}
+          investmentPhp={investmentPhp}
+          monthlyIncome={monthlyIncome}
+          allocation={allocation}
         />
       </div>
 
