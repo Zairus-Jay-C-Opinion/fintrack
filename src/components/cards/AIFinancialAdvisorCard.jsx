@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../ui/Button";
-import { Sparkles, Send, Loader2 } from "lucide-react";
+import { Sparkles, Send, Loader2, Trash2 } from "lucide-react";
 
 export default function AIFinancialAdvisorCard({
   netWorth,
@@ -10,10 +10,26 @@ export default function AIFinancialAdvisorCard({
   monthlyIncome,
   allocation,
 }) {
-  const [prompt, setPrompt] = useState("");
-  const [response, setResponse] = useState("");
+  const [prompt, setPrompt] = useState(() => sessionStorage.getItem("fintrack_ai_prompt") || "");
+  const [response, setResponse] = useState(() => sessionStorage.getItem("fintrack_ai_response") || "");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    sessionStorage.setItem("fintrack_ai_prompt", prompt);
+  }, [prompt]);
+
+  useEffect(() => {
+    sessionStorage.setItem("fintrack_ai_response", response);
+  }, [response]);
+
+  const handleClear = () => {
+    setPrompt("");
+    setResponse("");
+    setError("");
+    sessionStorage.removeItem("fintrack_ai_prompt");
+    sessionStorage.removeItem("fintrack_ai_response");
+  };
   const handleAsk = async () => {
     if (!prompt.trim()) return;
 
@@ -116,7 +132,7 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <textarea
-            className="w-full rounded-[var(--radius-md)] border border-accent bg-bg-deep px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
+            className="w-full rounded-[var(--radius-md)] border border-accent bg-bg-deep px-4 py-3 text-sm text-white placeholder:text-gray-400 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
             placeholder="E.g., How can I optimize my savings?"
             rows={1}
             value={prompt}
@@ -125,14 +141,26 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
             disabled={isLoading}
           />
         </div>
-        <Button
-          onClick={handleAsk}
-          disabled={isLoading || !prompt.trim()}
-          className="self-end sm:self-auto h-[50px] px-6 py-0 flex items-center justify-center gap-2 bg-gain hover:bg-gain/90 text-white"
-        >
-          {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-          <span className="hidden sm:inline">{isLoading ? "Thinking..." : "Ask AI"}</span>
-        </Button>
+        <div className="flex gap-2 self-end sm:self-auto">
+          <Button
+            onClick={handleAsk}
+            disabled={isLoading || !prompt.trim()}
+            className="h-[50px] px-6 py-0 flex items-center justify-center gap-2 bg-gain hover:bg-gain/90 text-white"
+          >
+            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+            <span className="hidden sm:inline">{isLoading ? "Thinking..." : "Ask AI"}</span>
+          </Button>
+          {(prompt || response) && (
+            <Button
+              onClick={handleClear}
+              disabled={isLoading}
+              className="h-[50px] px-4 py-0 flex items-center justify-center gap-2 bg-loss/10 hover:bg-loss/20 text-loss border border-loss/20"
+              title="Clear input and response"
+            >
+              <Trash2 size={18} />
+            </Button>
+          )}
+        </div>
       </div>
 
       {error && (
