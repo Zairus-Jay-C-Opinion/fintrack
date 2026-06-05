@@ -53,7 +53,7 @@ export default function Dashboard() {
   }, [purchases]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div>
         <TopBar
           title="Dashboard"
           subtitle="Your complete financial picture at a glance"

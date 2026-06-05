@@ -23,7 +23,7 @@ function AppRoutes() {
 
   return (
     <MarketChartProvider>
-    <div className="flex h-[100dvh] max-h-[100dvh] w-full max-w-full overflow-hidden bg-bg-deepest pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:h-full md:max-h-none md:pb-0">
+    <div className="flex h-[100dvh] max-h-[100dvh] w-full max-w-full overflow-hidden bg-bg-deepest pt-[env(safe-area-inset-top)] pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:h-full md:max-h-none md:pb-0 md:pt-0">
       <Sidebar collapsed={sidebarCollapsed} />
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <PageWrapper>
