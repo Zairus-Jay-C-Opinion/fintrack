@@ -1,6 +1,10 @@
 # FinTrack
 
-A personal finance dashboard for tracking income allocation, expenses, savings, goals, and investments. Built as a single-page React app with client-side storage—no user accounts or central database.
+A personal finance dashboard for tracking expenses, savings, investments, and long-term wealth — built for the Philippine peso with live USD market data.
+
+**Live app:** https://fintrack-one-sigma.vercel.app
+
+---
 
 ## Overview
 
@@ -8,69 +12,36 @@ FinTrack helps you see net worth and cash flow in one place, with a focus on **P
 
 Data lives in the browser (`localStorage` via Zustand persist). Charts and summaries update from the data you enter; investment prices and history can be refreshed from external APIs when deployed with the required server environment.
 
-The UI is responsive: a sidebar on desktop and a bottom navigation bar on mobile (including a **More** hub for Forecasting, Analytics, and Settings).
+The UI is responsive: a sidebar on desktop and a bottom navigation bar on mobile.
 
 ---
 
-## Features by section
+## Pages & Features
 
 ### Dashboard
-- **Net worth** breakdown: cash on hand, savings balance, investments (converted to PHP).
-- **Allocation** card showing target vs. implied amounts from monthly income.
-- **Next payday** countdown from configured paydays.
-- **Monthly spending** bar chart from expense transactions.
-- **Portfolio growth** chart from investment purchase history.
+Your complete financial picture at a glance. Shows total net worth broken down into cash, savings, and investments (all in PHP). Displays your monthly income, a payday countdown with a recommended allocation action for that day, a monthly spending bar chart, and a portfolio growth curve built from your investment history.
+- **AI Financial Advisor:** Ask for tailored advice based on your current financial context using the Gemini API.
 
 ### Expenses
-- Log transactions with date, category, amount, and optional notes.
-- Month filter and totals for the selected period.
+Tracks your day-to-day spending against your monthly spending allowance. Log purchases with a date, item name, and category. A visual budget bar shows how much of your allowance is left.
 
 ### Savings
-- Savings ledger with running balance and interest rate.
-- Emergency fund and cash-on-hand fields.
-- Savings-over-time chart.
+Tracks your bank savings balance through deposits and withdrawals. Shows your monthly savings target, your emergency fund amount, and a selected bank. Includes an interest projection chart.
 
 ### Goals
-- Savings goals with target amount, optional deadline, and progress.
-- Contribution tracking toward each goal.
+Create savings goals with a target amount and deadline. Each goal shows a progress bar and how much is still needed. The **Fund goals** feature distributes money across all goals simultaneously.
 
 ### Investments
-- Holdings built from purchase log (ticker, shares, price, fees, date).
-- Portfolio stats: total invested, current value, unrealized P/L, monthly DCA estimate.
-- **Refresh live** for quotes and ~90-day price history charts.
-- Per-ticker chart tabs when multiple symbols are held.
-- Holdings allocation donut and editable manual prices.
-- PHP/USD rate display with optional live FX refresh.
+Tracks your stock and ETF portfolio. The holdings table shows average cost, current price, current value, and unrealized gain/loss. Live prices and ~90-day price history charts are fetched from market data. A portfolio mix donut chart shows allocation.
 
 ### Forecasting
-- Long-horizon projection charts (1–30 years) with adjustable contribution and return assumptions.
-- Goal time-to-target and scenario comparisons.
+Projects long-term investment growth using Dollar-Cost Averaging (DCA) and compound interest. A goal calculator shows how many years it will take to reach a target amount.
 
 ### Analytics
-- Financial health score, savings rate, allocation snapshot, and trend charts derived from stored data.
+Tracks financial health trends over time. Shows a financial health score, your target vs. actual savings and investment rates, and a net worth progression area chart.
 
 ### Settings
-- **Allocation** sliders (investments / savings / spending).
-- Monthly income and one or two monthly paydays.
-- PHP/USD rate and currency display toggles.
-- Browser notifications (payday reminders, optional market-related alerts).
-- Optional automatic stock price refresh interval.
-- **Export / import** full app data as JSON.
-- Reset finance or settings data.
-
----
-
-## Market data
-
-| Data | Source | Notes |
-|------|--------|--------|
-| Live stock quote | Finnhub | Proxied through `/api/quote` on the host; requires `FINNHUB_API_KEY` in server environment |
-| Price history chart | Yahoo Finance | Proxied through `/api/stock-chart`; no API key |
-| FX (PHP/USD) | External rate endpoint used by the exchange-rate hook | Fetched on demand from the client |
-
-Chart history and last refresh time are stored in the finance store and persist across navigation and reloads. Manual **Refresh live** on Investments is the primary way to load or update charts; automatic refresh is optional in Settings.
-
-If live quotes fail (missing key, rate limits, or network issues), the app may fall back to the latest closing price from chart data when available.
+Central configuration for the entire app. Set your monthly income, payday schedule, and PHP/USD exchange rate. The allocation editor lets you adjust the percentage split. Export or import full app data as JSON.
 
 ---
 
@@ -83,38 +54,7 @@ If live quotes fail (missing key, rate limits, or network issues), the app may f
 | Styling | Tailwind CSS 3 |
 | State | Zustand 5 with `persist` middleware |
 | Charts | Recharts 3 |
-| Motion | Framer Motion |
-| Icons | Lucide React |
-| Dates | date-fns |
-| Serverless API | Vercel-style functions in `/api` (`quote.js`, `stock-chart.js`) |
-
-Local development can proxy `/api/*` through Vite middleware (`vite.config.js` + `server/marketApi.js`).
-
----
-
-## Data & privacy
-
-- All finance and settings records are stored **only in the browser** under `fintrack-data` and `fintrack-settings`.
-- Export produces a JSON file you control; import merges into the current device.
-- API keys for Finnhub must **not** be committed to the repository. Use environment variables on the deployment host and optionally a local `.env` file (gitignored) for development.
-- The app does not implement authentication; anyone with access to the device/browser profile can see stored data.
-
----
-
-## Project structure
-
-```
-api/                 Serverless quote + chart endpoints
-server/              Shared market API logic for dev proxy
-src/
-  components/        UI, charts, forms, layout
-  contexts/          App-wide providers (e.g. market chart)
-  hooks/             Data fetching, projections, notifications
-  pages/             Route-level screens
-  store/             Zustand finance + settings stores
-  utils/             Currency, finance math, formatters
-public/              Static assets and PWA icons
-```
+| Serverless API | Vercel functions |
 
 ---
 
@@ -123,8 +63,9 @@ public/              Static assets and PWA icons
 | Variable | Where | Purpose |
 |----------|--------|---------|
 | `FINNHUB_API_KEY` | Server only (host env or local `.env`) | Authenticates live quote requests |
+| `VITE_GEMINI_API_KEY` | Vite client (`.env` or Vercel env) | Powers the AI Financial Advisor |
 
-`.env.example` documents the variable name for local setup. Client bundles do not embed this key.
+`.env.example` documents the variable names for local setup. Client bundles do embed VITE_ variables, so keep them secure in production settings.
 
 ---
 
@@ -135,22 +76,4 @@ npm install    # Install dependencies
 npm run dev    # Development server with hot reload
 npm run build  # Production build to dist/
 npm run preview # Serve production build locally
-npm run lint   # ESLint
 ```
-
-For local dev with live quotes, set `FINNHUB_API_KEY` in `.env` (see `.env.example`).
-
----
-
-## Deployment notes
-
-- **Build command:** `npm run build`
-- **Output directory:** `dist`
-- **SPA routing:** non-API routes should rewrite to `index.html` (see `vercel.json`).
-- Set `FINNHUB_API_KEY` in the hosting platform’s environment for Production (and Preview if you test branches there).
-
----
-
-## Browser support
-
-Works in modern Chromium-based browsers (Chrome, Edge, Opera GX), Firefox, and Safari. Some features (notifications, `localStorage` quotas) depend on browser permissions and storage policies. After deployments, a normal navigation or cache clear may be needed if an older cached bundle is still served.
