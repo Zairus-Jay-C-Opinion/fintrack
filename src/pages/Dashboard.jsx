@@ -53,111 +53,111 @@ export default function Dashboard() {
   }, [purchases]);
 
   return (
-    <>
-      <TopBar
-        title="Dashboard"
-        subtitle="Your complete financial picture at a glance"
-      />
+    <div className="flex flex-col min-h-screen">
+        <TopBar
+          title="Dashboard"
+          subtitle="Your complete financial picture at a glance"
+        />
 
-      <PageHelp title="How the Dashboard works">
-        <p>
-          Net worth = cash + savings balance + investments (in PHP). Income is
-          split by your allocation % into investments, savings, and spending —
-          each bucket is separate. Charts summarize trends; log data on other
-          tabs to populate them.
-        </p>
-      </PageHelp>
+        <PageHelp title="How the Dashboard works">
+          <p>
+            Net worth = cash + savings balance + investments (in PHP). Income is
+            split by your allocation % into investments, savings, and spending —
+            each bucket is separate. Charts summarize trends; log data on other
+            tabs to populate them.
+          </p>
+        </PageHelp>
 
-      <div className="mb-6">
-        <NetWorthCard
-          netWorth={netWorth}
-          breakdown={[
-            { label: "Cash", value: formatPhp(cashOnHand) },
-            { label: "Savings", value: formatPhp(savingsBalance) },
-            { label: "Investments", value: formatPhp(investmentPhp) },
-          ]}
-        />
-      </div>
-
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          index={0}
-          label="Total Net Worth"
-          value={formatPhp(netWorth)}
-        />
-        <StatCard
-          index={1}
-          label="This Month's Income"
-          value={formatPhp(monthlyIncome)}
-          sub={paydayLabel}
-        />
-        <StatCard
-          index={2}
-          label="Savings Balance"
-          value={formatPhp(savingsBalance)}
-        />
-        <StatCard
-          index={3}
-          label="Investment Value"
-          value={formatPhp(investmentPhp)}
-          sub="PHP equivalent"
-        />
-      </div>
-
-      <div className="mb-6">
-        <AIFinancialAdvisorCard
-          netWorth={netWorth}
-          cashOnHand={cashOnHand}
-          savingsBalance={savingsBalance}
-          investmentPhp={investmentPhp}
-          monthlyIncome={monthlyIncome}
-          allocation={allocation}
-        />
-      </div>
-
-      <div className="mb-6 grid gap-4 lg:grid-cols-2">
-        <AllocationCard allocation={allocation} amounts={allocAmounts} />
-        <MonthlyBarChart
-          monthlyIncome={monthlyIncome}
-          transactions={transactions}
-        />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <PortfolioGrowthChart data={portfolioChartData} />
+        <div className="mb-6">
+          <NetWorthCard
+            netWorth={netWorth}
+            breakdown={[
+              { label: "Cash", value: formatPhp(cashOnHand) },
+              { label: "Savings", value: formatPhp(savingsBalance) },
+              { label: "Investments", value: formatPhp(investmentPhp) },
+            ]}
+          />
         </div>
-        <div className="card flex flex-col justify-center">
-          <div className="flex items-center gap-2 text-highlight">
-            <Calendar size={20} />
-            <span className="font-display font-semibold text-white">
-              Next Payday
-            </span>
+
+        <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            index={0}
+            label="Total Net Worth"
+            value={formatPhp(netWorth)}
+          />
+          <StatCard
+            index={1}
+            label="This Month's Income"
+            value={formatPhp(monthlyIncome)}
+            sub={paydayLabel}
+          />
+          <StatCard
+            index={2}
+            label="Savings Balance"
+            value={formatPhp(savingsBalance)}
+          />
+          <StatCard
+            index={3}
+            label="Investment Value"
+            value={formatPhp(investmentPhp)}
+            sub="PHP equivalent"
+          />
+        </div>
+
+        <div className="mb-6">
+          <AIFinancialAdvisorCard
+            netWorth={netWorth}
+            cashOnHand={cashOnHand}
+            savingsBalance={savingsBalance}
+            investmentPhp={investmentPhp}
+            monthlyIncome={monthlyIncome}
+            allocation={allocation}
+          />
+        </div>
+
+        <div className="mb-6 grid gap-4 lg:grid-cols-2">
+          <AllocationCard allocation={allocation} amounts={allocAmounts} />
+          <MonthlyBarChart
+            monthlyIncome={monthlyIncome}
+            transactions={transactions}
+          />
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <PortfolioGrowthChart data={portfolioChartData} />
           </div>
-          {nextPayday ? (
-            <>
-              <p className="mt-4 font-mono text-3xl text-white">
-                {days} {days === 1 ? "day" : "days"}
-              </p>
-              <p className="mt-1 text-sm text-text-secondary">
-                {format(nextPayday, "EEEE, MMM d")}
-              </p>
-              <div className="mt-6 rounded-[var(--radius-md)] border border-accent bg-bg-deepest p-4">
-                <p className="text-xs text-text-secondary">Recommended action</p>
-                <p className="mt-2 text-sm text-text-primary">
-                  Allocate {formatPhp(allocAmounts.investments)} to ETF DCA and{" "}
-                  {formatPhp(allocAmounts.savings)} to GoTyme savings.
+          <div className="card flex flex-col justify-center">
+            <div className="flex items-center gap-2 text-highlight">
+              <Calendar size={20} />
+              <span className="font-display font-semibold text-white">
+                Next Payday
+              </span>
+            </div>
+            {nextPayday ? (
+              <>
+                <p className="mt-4 font-mono text-3xl text-white">
+                  {days} {days === 1 ? "day" : "days"}
                 </p>
-                <p className="mt-2 flex items-center gap-1 text-xs text-highlight">
-                  <ArrowRight size={14} /> Review on Investments page
+                <p className="mt-1 text-sm text-text-secondary">
+                  {format(nextPayday, "EEEE, MMM d")}
                 </p>
-              </div>
-            </>
-          ) : (
-            <p className="mt-4 text-text-secondary">Configure paydays in Settings</p>
-          )}
+                <div className="mt-6 rounded-[var(--radius-md)] border border-accent bg-bg-deepest p-4">
+                  <p className="text-xs text-text-secondary">Recommended action</p>
+                  <p className="mt-2 text-sm text-text-primary">
+                    Allocate {formatPhp(allocAmounts.investments)} to ETF DCA and{" "}
+                    {formatPhp(allocAmounts.savings)} to GoTyme savings.
+                  </p>
+                  <p className="mt-2 flex items-center gap-1 text-xs text-highlight">
+                    <ArrowRight size={14} /> Review on Investments page
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p className="mt-4 text-text-secondary">Configure paydays in Settings</p>
+            )}
+          </div>
         </div>
       </div>
-    </>
   );
 }
