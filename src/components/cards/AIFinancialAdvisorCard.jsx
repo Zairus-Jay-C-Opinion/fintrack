@@ -132,7 +132,7 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <textarea
-            className="w-full rounded-[var(--radius-md)] border border-accent bg-bg-deep px-4 py-3 text-sm text-white placeholder:text-gray-400 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
+            className="w-full rounded-[var(--radius-md)] border border-accent bg-bg-deep px-4 py-3 text-sm text-gray-800 placeholder:text-gray-500 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
             placeholder="E.g., How can I optimize my savings?"
             rows={1}
             value={prompt}
