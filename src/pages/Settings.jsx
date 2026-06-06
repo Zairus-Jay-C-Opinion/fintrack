@@ -7,6 +7,9 @@ import Button from "../components/ui/Button";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { useFinanceStore } from "../store/useFinanceStore";
 import { requestNotificationPermission, maskApiKey } from "../utils/notifications";
+import { useWalkthrough } from "../contexts/WalkthroughContext";
+import { HelpCircle } from "lucide-react";
+
 
 function clampPayday(day) {
   if (day == null || isNaN(day)) return null;
@@ -14,6 +17,7 @@ function clampPayday(day) {
 }
 
 export default function Settings() {
+  const { restartTour } = useWalkthrough();
   const allocation = useSettingsStore((s) => s.allocation);
   const updateAllocation = useSettingsStore((s) => s.updateAllocation);
   const monthlyIncome = useSettingsStore((s) => s.monthlyIncome);
@@ -375,6 +379,24 @@ export default function Settings() {
               setStockRefreshMinutes(parseInt(e.target.value, 10) || 15)
             }
           />
+        </div>
+
+        <div className="card">
+          <div className="flex items-center gap-2">
+            <HelpCircle size={18} className="text-highlight" />
+            <h3 className="font-display text-lg font-semibold text-white">
+              Help &amp; Onboarding
+            </h3>
+          </div>
+          <p className="mt-2 text-sm text-text-secondary">
+            New to FinTrack? Replay the guided tour to learn about every section of the app.
+          </p>
+          <div className="mt-4">
+            <Button onClick={restartTour} variant="secondary">
+              <HelpCircle size={15} />
+              Restart Tour
+            </Button>
+          </div>
         </div>
 
         <div className="card lg:col-span-2">

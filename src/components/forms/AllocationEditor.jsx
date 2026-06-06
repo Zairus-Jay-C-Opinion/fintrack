@@ -10,7 +10,7 @@ const LABELS = {
   spending: "Spending",
 };
 
-export default function AllocationEditor({ allocation, onSave }) {
+export default function AllocationEditor({ allocation, onSave, hideSave }) {
   const [local, setLocal] = useState({
     investments: allocation.investments * 100,
     savings: allocation.savings * 100,
@@ -29,7 +29,16 @@ export default function AllocationEditor({ allocation, onSave }) {
   const valid = Math.abs(total - 100) < 0.5;
 
   const handleChange = (key, value) => {
-    setLocal((prev) => ({ ...prev, [key]: value }));
+    const newLocal = { ...local, [key]: value };
+    setLocal(newLocal);
+    
+    if (hideSave) {
+      onSave({
+        investments: newLocal.investments / 100,
+        savings: newLocal.savings / 100,
+        spending: newLocal.spending / 100,
+      });
+    }
   };
 
   const handleSave = () => {
@@ -66,9 +75,11 @@ export default function AllocationEditor({ allocation, onSave }) {
         Target: {formatPercent(allocation.investments)} inv /{" "}
         {formatPercent(allocation.savings)} save
       </p>
-      <Button onClick={handleSave} disabled={!valid}>
-        Save allocation
-      </Button>
+      {!hideSave && (
+        <Button onClick={handleSave} disabled={!valid}>
+          Save allocation
+        </Button>
+      )}
     </div>
   );
 }

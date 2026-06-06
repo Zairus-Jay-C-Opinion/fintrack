@@ -4,8 +4,8 @@ export const userProfile = {
   age: 18,
   country: "PH",
   currency: "PHP",
-  monthlyIncome: 15000,
-  paydays: [15, 30],
+  monthlyIncome: 0,
+  paydays: [],
   bankAccount: "GoTyme",
   broker: "GoTrade",
   baseCurrency: "PHP",
@@ -13,7 +13,8 @@ export const userProfile = {
 };
 
 export const defaultAllocation = {
-  investments: 0.67,
-  savings: 0.2,
-  spending: 0.13,
+  investments: 0,
+  savings: 0,
+  spending: 0,
 };
+

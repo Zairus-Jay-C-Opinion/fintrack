@@ -12,19 +12,20 @@ import {
 import { userProfile } from "../../constants/userProfile";
 
 const navItems = [
-  { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/expenses", icon: Receipt, label: "Expenses" },
-  { to: "/savings", icon: PiggyBank, label: "Savings" },
-  { to: "/goals", icon: Target, label: "Goals" },
-  { to: "/investments", icon: TrendingUp, label: "Investments" },
-  { to: "/forecasting", icon: LineChart, label: "Forecasting" },
-  { to: "/analytics", icon: BarChart3, label: "Analytics" },
-  { to: "/settings", icon: Settings, label: "Settings" },
+  { to: "/", icon: LayoutDashboard, label: "Dashboard", tourId: "tour-dashboard" },
+  { to: "/expenses", icon: Receipt, label: "Expenses", tourId: "tour-expenses" },
+  { to: "/savings", icon: PiggyBank, label: "Savings", tourId: "tour-savings" },
+  { to: "/goals", icon: Target, label: "Goals", tourId: "tour-goals" },
+  { to: "/investments", icon: TrendingUp, label: "Investments", tourId: "tour-investments" },
+  { to: "/forecasting", icon: LineChart, label: "Forecasting", tourId: "tour-forecasting" },
+  { to: "/analytics", icon: BarChart3, label: "Analytics", tourId: "tour-analytics" },
+  { to: "/settings", icon: Settings, label: "Settings", tourId: "tour-settings" },
 ];
 
 export default function Sidebar({ collapsed }) {
   return (
     <aside
+      data-tour="tour-sidebar"
       className={`hidden h-full flex-shrink-0 flex-col border-r border-accent bg-bg-deepest md:flex ${
         collapsed ? "w-[72px]" : "w-60"
       }`}
@@ -51,11 +52,12 @@ export default function Sidebar({ collapsed }) {
         </div>
       </div>
       <nav className="flex-1 space-y-1 p-3">
-        {navItems.map(({ to, icon: Icon, label }) => (
+        {navItems.map(({ to, icon: Icon, label, tourId }) => (
           <NavLink
             key={to}
             to={to}
             end={to === "/"}
+            data-tour={tourId}
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2.5 text-sm transition-colors ${
                 isActive
