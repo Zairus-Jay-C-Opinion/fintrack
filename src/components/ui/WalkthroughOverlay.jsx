@@ -1,6 +1,7 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Receipt,
@@ -14,74 +15,136 @@ import {
   ChevronRight,
   Check,
   X,
+  RefreshCcw,
+  DollarSign,
+  Cpu,
 } from "lucide-react";
 import { useWalkthrough } from "../../contexts/WalkthroughContext";
 
-/** Tour step definitions — targetId maps to data-tour attributes on nav items */
+/**
+ * STEPS — each step can optionally define:
+ *   navigateTo: the route to navigate to before spotlighting
+ *   targetId:   data-tour attribute to spotlight (null = center tooltip)
+ */
 const STEPS = [
+  // ── 1. Overview
   {
     targetId: "tour-sidebar",
+    navigateTo: "/",
     icon: LayoutDashboard,
-    title: "Your Financial Hub",
+    title: "Welcome — Here's how FinTrack works",
     description:
-      "FinTrack gives you a complete picture of your finances in one place. Use the sidebar (or bottom nav on mobile) to navigate between sections.",
-    placement: "right",
+      "FinTrack is your personal money command centre. Everything lives in the sidebar on the left (or bottom bar on mobile). Each section of the app has a specific job — this tour will walk you through each one and explain what to do.",
   },
+
+  // ── 2. Dashboard
   {
     targetId: "tour-dashboard",
+    navigateTo: "/",
     icon: LayoutDashboard,
-    title: "Dashboard",
+    title: "Dashboard — Your Money at a Glance",
     description:
-      "Your financial snapshot at a glance — net worth, income split, savings, investments, and an AI advisor that gives you personalised tips.",
-    placement: "right",
+      "The Dashboard is your home screen. It shows your net worth, how your money is split between investing, saving, and spending, upcoming paydays, and an AI advisor that gives you personalised tips based on your real data.",
   },
+
+  // ── 3. Expenses
   {
     targetId: "tour-expenses",
+    navigateTo: "/expenses",
     icon: Receipt,
-    title: "Expenses",
+    title: "Expenses — Where Does the Money Go?",
     description:
-      "Log every peso you spend, categorise it, and see monthly breakdowns. Spot patterns and trim the fat from your budget.",
-    placement: "right",
+      "Every time you spend money, log it here. Give it a category (food, transport, shopping…) and a date. FinTrack will build monthly spending charts so you can see patterns and cut back where needed.",
   },
+
+  // ── 4. Savings
   {
     targetId: "tour-savings",
+    navigateTo: "/savings",
     icon: PiggyBank,
-    title: "Savings",
+    title: "Savings — Building Your Safety Net",
     description:
-      "Track your savings accounts and deposits. Set targets and watch your balances grow over time.",
-    placement: "right",
+      "Track your savings accounts and deposits over time. You can record how much you've set aside each month, see your total saved balance, and make sure you're hitting the savings percentage you set during setup.",
   },
+
+  // ── 5. Goals
   {
     targetId: "tour-goals",
+    navigateTo: "/goals",
     icon: Target,
-    title: "Goals",
+    title: "Goals — Plan for What Matters",
     description:
-      "Define financial milestones — emergency fund, dream vacation, house down-payment — and FinTrack will track your progress automatically.",
-    placement: "right",
+      "Goals let you save toward specific targets: an emergency fund, a new phone, a vacation, or a house down-payment. Set the amount you need and the date you want it by — FinTrack tracks your progress automatically.",
   },
+
+  // ── 6. Investments (detailed)
   {
     targetId: "tour-investments",
+    navigateTo: "/investments",
     icon: TrendingUp,
-    title: "Investments",
+    title: "Investments — Your Stock Portfolio",
     description:
-      "Monitor your portfolio in real time. Log stock and ETF purchases, see live prices, and track total portfolio value in PHP.",
-    placement: "right",
+      "This is where you log every stock or ETF you own. Add a ticker symbol (e.g. AAPL for Apple), the number of shares you bought, and your buy price. FinTrack will fetch the live market price and calculate your total gain or loss automatically.",
   },
+
+  // ── 7. Investments — portfolio value
+  {
+    targetId: "tour-investments",
+    navigateTo: "/investments",
+    icon: TrendingUp,
+    title: "Investments — Portfolio Value in PHP",
+    description:
+      "Because stocks are priced in US Dollars (USD), FinTrack converts your portfolio value to Philippine Pesos (PHP) using the exchange rate you set in Settings. This is why keeping that rate up to date matters — it directly affects the numbers you see here.",
+  },
+
+  // ── 8. Forecasting
   {
     targetId: "tour-forecasting",
+    navigateTo: "/forecasting",
     icon: LineChart,
-    title: "Forecasting",
+    title: "Forecasting — See Your Financial Future",
     description:
-      "Project your financial future with income vs. expense forecasts. See where you'll be in 3, 6, or 12 months.",
-    placement: "right",
+      "Forecasting uses your income, expenses, and savings history to project where your money will be in 3, 6, or 12 months. If the projection looks bad, it's a signal to adjust your spending or savings before it's too late.",
   },
+
+  // ── 9. Analytics
+  {
+    targetId: "tour-analytics",
+    navigateTo: "/analytics",
+    icon: BarChart3,
+    title: "Analytics — Trends Over Time",
+    description:
+      "Analytics gives you deeper charts: month-by-month expense trends, category breakdowns, savings growth rate, and investment performance over time. Use this to spot long-term patterns that the Dashboard doesn't show.",
+  },
+
+  // ── 10. Settings — Exchange Rate (navigate there, spotlight the field)
+  {
+    targetId: "tour-exchange-rate",
+    navigateTo: "/settings",
+    icon: DollarSign,
+    title: "Exchange Rate — Keeping Your Numbers Accurate",
+    description:
+      "This setting controls how FinTrack converts between USD and PHP. For example, if 1 USD = 56.50 PHP, enter 56.50. You need to update this manually whenever the rate changes — you can check the current rate on Google by searching 'USD to PHP'.",
+  },
+
+  // ── 11. Settings — Live Stock Prices
+  {
+    targetId: "tour-live-prices",
+    navigateTo: "/settings",
+    icon: RefreshCcw,
+    title: "Live Stock Prices — Auto-Refresh",
+    description:
+      "FinTrack can automatically refresh your stock prices while you're on the Investments page. Turn on 'Auto-refresh' here and set how often (every 5–60 minutes). This keeps your portfolio value current without you having to reload the page.",
+  },
+
+  // ── 12. Settings overview
   {
     targetId: "tour-settings",
+    navigateTo: "/settings",
     icon: Settings,
-    title: "Settings",
+    title: "Settings — Your Control Panel",
     description:
-      "Configure your monthly income, paydays, allocation percentages (invest / save / spend), currency display, and more. Start here first!",
-    placement: "right",
+      "Settings is also where you change your monthly income, payday dates, and allocation percentages (how much of your income goes to investing, saving, and spending). If anything feels off in the app, start here.",
   },
 ];
 
@@ -97,9 +160,13 @@ function useSpotlightRect(targetId, phase, step) {
   }, [targetId]);
 
   useEffect(() => {
-    measure();
+    // Small delay to let page render before measuring
+    const t = setTimeout(measure, 120);
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", measure);
+    };
   }, [measure, phase, step]);
 
   return rect;
@@ -115,10 +182,9 @@ function TooltipCard({ step, totalSteps, onNext, onPrev, onSkip, currentStep }) 
   const rect = useSpotlightRect(spotlightId, "tour", currentStep);
 
   const PAD = 16;
-  const TOOLTIP_W = 300;
-  const TOOLTIP_H = 220;
+  const TOOLTIP_W = 320;
+  const TOOLTIP_H = 240;
 
-  // Compute tooltip position based on spotlight rect
   let tooltipStyle = {};
   let arrowClass = "tour-tooltip-arrow-left";
 
@@ -128,39 +194,33 @@ function TooltipCard({ step, totalSteps, onNext, onPrev, onSkip, currentStep }) 
     const spaceRight = vw - (rect.left + rect.width);
     const spaceLeft = rect.left;
     const spaceBelow = vh - (rect.top + rect.height);
-    const spaceAbove = rect.top;
 
     if (spaceRight >= TOOLTIP_W + PAD * 2) {
-      // Place right
       tooltipStyle = {
         top: clamp(rect.top + rect.height / 2 - TOOLTIP_H / 2, PAD, vh - TOOLTIP_H - PAD),
         left: rect.left + rect.width + PAD,
       };
       arrowClass = "tour-tooltip-arrow-left";
     } else if (spaceLeft >= TOOLTIP_W + PAD * 2) {
-      // Place left
       tooltipStyle = {
         top: clamp(rect.top + rect.height / 2 - TOOLTIP_H / 2, PAD, vh - TOOLTIP_H - PAD),
         left: rect.left - TOOLTIP_W - PAD,
       };
       arrowClass = "tour-tooltip-arrow-right";
     } else if (spaceBelow >= TOOLTIP_H + PAD * 2) {
-      // Place below
       tooltipStyle = {
         top: rect.top + rect.height + PAD,
         left: clamp(rect.left + rect.width / 2 - TOOLTIP_W / 2, PAD, vw - TOOLTIP_W - PAD),
       };
       arrowClass = "tour-tooltip-arrow-top";
     } else {
-      // Place above
       tooltipStyle = {
-        top: rect.top - TOOLTIP_H - PAD,
+        top: clamp(rect.top - TOOLTIP_H - PAD, PAD, vh - TOOLTIP_H - PAD),
         left: clamp(rect.left + rect.width / 2 - TOOLTIP_W / 2, PAD, vw - TOOLTIP_W - PAD),
       };
       arrowClass = "tour-tooltip-arrow-bottom";
     }
   } else {
-    // Fallback: center of screen
     tooltipStyle = { top: "50%", left: "50%", transform: "translate(-50%,-50%)" };
     arrowClass = "";
   }
@@ -231,20 +291,30 @@ function TooltipCard({ step, totalSteps, onNext, onPrev, onSkip, currentStep }) 
 
 export default function WalkthroughOverlay() {
   const { phase, step, nextStep, prevStep, skipAll, dismissDone } = useWalkthrough();
+  const navigate = useNavigate();
   const isTour = phase === "tour";
   const isDone = phase === "done";
 
   const currentStepData = STEPS[step] ?? null;
+  const prevStepRef = useRef(step);
+
+  // Navigate to the page required by this step
+  useEffect(() => {
+    if (!isTour || !currentStepData?.navigateTo) return;
+    navigate(currentStepData.navigateTo);
+    prevStepRef.current = step;
+  }, [isTour, step, currentStepData, navigate]);
+
   const spotlightRect = useSpotlightRect(
     isTour && currentStepData ? currentStepData.targetId : null,
     phase,
     step
   );
 
-  // Dismiss the "done" toast automatically after 3s
+  // Dismiss the "done" toast automatically after 4s
   useEffect(() => {
     if (!isDone) return;
-    const t = setTimeout(dismissDone, 3000);
+    const t = setTimeout(dismissDone, 4000);
     return () => clearTimeout(t);
   }, [isDone, dismissDone]);
 
@@ -340,7 +410,7 @@ export default function WalkthroughOverlay() {
             <span className="tour-done-icon">🎉</span>
             <div>
               <p className="tour-done-title">You're all set!</p>
-              <p className="tour-done-sub">Go to Settings first to configure your income.</p>
+              <p className="tour-done-sub">You can replay this tour any time from Settings.</p>
             </div>
             <button className="tour-close-btn" onClick={dismissDone} aria-label="Dismiss">
               <X size={14} />

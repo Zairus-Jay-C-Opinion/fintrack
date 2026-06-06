@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, TrendingUp, PiggyBank, Target, Receipt, LineChart, BarChart3, Settings, X } from "lucide-react";
+import { TrendingUp, PiggyBank, Target, Receipt, LineChart, BarChart3, Settings, X, ArrowRight } from "lucide-react";
 import { useWalkthrough } from "../../contexts/WalkthroughContext";
 
 const features = [
@@ -59,9 +59,6 @@ export default function WelcomeModal() {
               transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.25 }}
             >
               <img src="/icon.png" alt="FinTrack" className="welcome-logo-img" />
-              <div className="welcome-sparkle">
-                <Sparkles size={16} />
-              </div>
             </motion.div>
 
             {/* Heading */}
@@ -100,8 +97,8 @@ export default function WelcomeModal() {
               transition={{ delay: 0.55 }}
             >
               <button className="welcome-btn-primary" onClick={startSetup}>
-                <Sparkles size={16} />
                 Start the tour
+                <ArrowRight size={16} />
               </button>
               <button className="welcome-btn-ghost" onClick={skipAll}>
                 I'll explore on my own
@@ -109,7 +106,7 @@ export default function WelcomeModal() {
             </motion.div>
 
             {/* Step hint */}
-            <p className="welcome-hint">8 quick steps · takes about 1 minute</p>
+            <p className="welcome-hint">12 guided steps · takes about 2 minutes</p>
           </motion.div>
         </motion.div>
       )}

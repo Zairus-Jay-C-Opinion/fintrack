@@ -244,13 +244,18 @@ export default function Settings() {
             </div>
           </div>
 
-          <Input
-            label="PHP / USD rate"
-            type="number"
-            step="0.01"
-            value={phpUsdRate}
-            onChange={(e) => updatePhpUsdRate(parseFloat(e.target.value) || 0)}
-          />
+          <div data-tour="tour-exchange-rate">
+            <Input
+              label="Currency Exchange Rate — How many Philippine Pesos equal 1 US Dollar (e.g. 56.50)"
+              type="number"
+              step="0.01"
+              value={phpUsdRate}
+              onChange={(e) => updatePhpUsdRate(parseFloat(e.target.value) || 0)}
+            />
+            <p className="mt-1 text-xs text-text-secondary">
+              Used to convert your investment values between USD and PHP. Update this whenever the rate changes.
+            </p>
+          </div>
           <div className="flex gap-4">
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -353,7 +358,7 @@ export default function Settings() {
           )}
         </div>
 
-        <div className="card space-y-4">
+        <div className="card space-y-4" data-tour="tour-live-prices">
           <h3 className="font-display text-lg font-semibold text-white">
             Live stock prices
           </h3>
