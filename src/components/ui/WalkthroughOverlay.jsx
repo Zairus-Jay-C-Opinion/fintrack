@@ -250,9 +250,8 @@ function computeTooltipPosition(rect, preferSide) {
 }
 
 // ─── Tooltip card ─────────────────────────────────────────
-function TooltipCard({ stepData, totalSteps, onNext, onPrev, onSkip, currentStep }) {
-  const { icon: Icon, title, description, targetId, preferSide } = stepData;
-  const rect = useSpotlightRect(targetId, "tour", currentStep);
+function TooltipCard({ stepData, totalSteps, onNext, onPrev, onSkip, currentStep, rect }) {
+  const { icon: Icon, title, description, preferSide } = stepData;
 
   let positionResult;
   if (rect) {
@@ -342,7 +341,7 @@ export default function WalkthroughOverlay() {
   useEffect(() => {
     if (!isTour || !currentStepData?.navigateTo) return;
     navigate(currentStepData.navigateTo);
-  }, [isTour, step]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isTour, step, navigate, currentStepData]);
 
   // Spotlight for the backdrop SVG (uses the outer overlay's measurement)
   const spotlightRect = useSpotlightRect(
@@ -422,7 +421,7 @@ export default function WalkthroughOverlay() {
 
       {/* ── Tooltip ── */}
       <AnimatePresence mode="wait">
-        {isTour && currentStepData && (
+        {isTour && currentStepData && spotlightRect && (
           <div className="tour-tooltip-portal" key={step}>
             <TooltipCard
               stepData={currentStepData}
@@ -431,6 +430,7 @@ export default function WalkthroughOverlay() {
               onNext={() => nextStep(STEPS.length)}
               onPrev={prevStep}
               onSkip={skipAll}
+              rect={spotlightRect}
             />
           </div>
         )}

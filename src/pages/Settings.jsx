@@ -8,6 +8,7 @@ import { useSettingsStore } from "../store/useSettingsStore";
 import { useFinanceStore } from "../store/useFinanceStore";
 import { requestNotificationPermission, maskApiKey } from "../utils/notifications";
 import { useWalkthrough } from "../contexts/WalkthroughContext";
+import { useExchangeRate } from "../hooks/useExchangeRate";
 import { HelpCircle } from "lucide-react";
 
 
@@ -53,6 +54,8 @@ export default function Settings() {
   const setPaydayNotifyHourStart = useSettingsStore((s) => s.setPaydayNotifyHourStart);
   const setPaydayNotifyHourEnd = useSettingsStore((s) => s.setPaydayNotifyHourEnd);
   const fileRef = useRef(null);
+  
+  const { fetchLiveRate, loading: fxLoading } = useExchangeRate();
 
   const enableNotifications = async () => {
     const perm = await requestNotificationPermission();
@@ -245,14 +248,27 @@ export default function Settings() {
           </div>
 
           <div data-tour="tour-exchange-rate">
-            <Input
-              label="Currency Exchange Rate — How many Philippine Pesos equal 1 US Dollar (e.g. 56.50)"
-              type="number"
-              step="0.01"
-              value={phpUsdRate}
-              onChange={(e) => updatePhpUsdRate(parseFloat(e.target.value) || 0)}
-            />
-            <p className="mt-1 text-xs text-text-secondary">
+            <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+              <div className="flex-1">
+                <Input
+                  label="Currency Exchange Rate (PHP to 1 USD)"
+                  type="number"
+                  step="0.01"
+                  value={phpUsdRate}
+                  onChange={(e) => updatePhpUsdRate(parseFloat(e.target.value) || 0)}
+                />
+              </div>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={fetchLiveRate}
+                disabled={fxLoading}
+                className="mb-[2px]"
+              >
+                {fxLoading ? "Fetching…" : "Fetch live"}
+              </Button>
+            </div>
+            <p className="mt-2 text-xs text-text-secondary">
               Used to convert your investment values between USD and PHP. Update this whenever the rate changes.
             </p>
           </div>

@@ -244,22 +244,7 @@ export default function Investments() {
         </div>
 
         <div className="space-y-4 min-w-0">
-          <div className="card">
-            <h3 className="font-display font-semibold text-white">FX Rate</h3>
-            <p className="mt-2 font-mono text-2xl text-white">
-              ₱{phpUsdRate.toFixed(2)} / USD
-            </p>
-            <div className="mt-3 flex gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={fetchLiveRate}
-                disabled={fxLoading}
-              >
-                {fxLoading ? "Fetching…" : "Fetch live"}
-              </Button>
-            </div>
-          </div>
+
           <div className="card">
             <h3 className="font-display font-semibold text-white">DCA Tracker</h3>
             <p className="mt-2 text-sm text-text-secondary">
