@@ -223,13 +223,13 @@ input[type="range"].allocation-slider::-ms-thumb {
   inset: 0;
   z-index: 9000;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1rem;
+  padding: 2rem 1rem;
   background: rgba(6, 20, 27, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* Animated background orbs */
@@ -299,6 +299,7 @@ input[type="range"].allocation-slider::-ms-thumb {
   position: relative;
   width: 100%;
   max-width: 440px;
+  margin: auto;
   background: linear-gradient(135deg, #11212d 0%, #1a2f3f 100%);
   border: 1px solid rgba(91, 143, 168, 0.3);
   border-radius: 24px;
@@ -309,6 +310,7 @@ input[type="range"].allocation-slider::-ms-thumb {
   align-items: center;
   text-align: center;
   gap: 1.25rem;
+  flex-shrink: 0;
 }
 
 .welcome-icon-wrap {
@@ -435,6 +437,34 @@ input[type="range"].allocation-slider::-ms-thumb {
   margin: 0;
   font-size: 0.75rem;
   color: rgba(155, 168, 171, 0.6);
+}
+
+/* Setup modal income input — explicit dark styling to override browser UA styles */
+.setup-income-input {
+  width: 100%;
+  background: #0d1e28;
+  border: 1px solid rgba(91, 143, 168, 0.4);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  color: #e8ebed;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.setup-income-input::placeholder {
+  color: rgba(155, 168, 171, 0.45);
+}
+.setup-income-input:focus {
+  border-color: #5b8fa8;
+  box-shadow: 0 0 0 3px rgba(91, 143, 168, 0.15);
+}
+.setup-income-input::-webkit-outer-spin-button,
+.setup-income-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* ═══════════════════════════════════════════════════════

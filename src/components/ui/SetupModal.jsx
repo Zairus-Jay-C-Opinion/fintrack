@@ -27,18 +27,24 @@ export default function SetupModal() {
     startTour();
   };
 
+  const handleSkip = () => {
+    startTour();
+  };
+
   return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
           className="welcome-backdrop"
+          style={{ overflowY: "auto", alignItems: "flex-start", padding: "2rem 1rem" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
         >
           <motion.div
-            className="welcome-card max-w-md w-full"
+            className="welcome-card"
+            style={{ width: "100%", maxWidth: "28rem", margin: "auto", flexShrink: 0 }}
             initial={{ opacity: 0, scale: 0.88, y: 32 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.88, y: 32 }}
@@ -50,7 +56,7 @@ export default function SetupModal() {
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Let's set up your baseline</h2>
               <p className="text-text-secondary text-sm">
-                To give you accurate tracking and forecasting, we need to know your monthly income and how you want to allocate it.
+                Tell us your monthly income and how you'd like to allocate it. You can always change this later in Settings.
               </p>
             </div>
 
@@ -61,7 +67,7 @@ export default function SetupModal() {
                 </label>
                 <input
                   type="number"
-                  className="w-full bg-bg-deeper border border-border/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                  className="setup-income-input"
                   placeholder="e.g. 50000"
                   value={localIncome}
                   onChange={(e) => setLocalIncome(e.target.value)}
@@ -82,13 +88,19 @@ export default function SetupModal() {
               </div>
             </div>
 
-            <div className="mt-8 flex justify-end">
+            <div className="mt-8 space-y-3">
               <button
                 className="welcome-btn-primary w-full"
                 onClick={handleContinue}
               >
                 Continue to Dashboard
                 <ArrowRight size={16} />
+              </button>
+              <button
+                className="welcome-btn-ghost w-full"
+                onClick={handleSkip}
+              >
+                Skip for now — I'll set this up later
               </button>
             </div>
           </motion.div>
