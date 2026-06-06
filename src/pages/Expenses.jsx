@@ -17,7 +17,7 @@ import {
 } from "../utils/expenses";
 import { format, parseISO } from "date-fns";
 import { analyzeReceipt } from "../utils/geminiVision";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Image, Loader2 } from "lucide-react";
 import { useRef } from "react";
 
 function BudgetBar({ label, spent, budget, hint }) {
@@ -59,6 +59,7 @@ export default function Expenses() {
   const [editing, setEditing] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
   const fileInputRef = useRef(null);
+  const uploadInputRef = useRef(null);
   const monthKey = getMonthKey();
 
   const spent = sumExpenses(transactions, monthKey);
@@ -94,11 +95,15 @@ export default function Expenses() {
 
   const handleScanClick = () => {
     const wantsToScan = window.confirm(
-      "FinTrack needs access to your camera or photo gallery to scan the receipt. Proceed?"
+      "FinTrack needs access to your camera to scan the receipt. Proceed?"
     );
     if (wantsToScan) {
       fileInputRef.current?.click();
     }
+  };
+
+  const handleUploadClick = () => {
+    uploadInputRef.current?.click();
   };
 
   const handleFileChange = async (e) => {
@@ -279,11 +284,27 @@ export default function Expenses() {
                 <><Camera size={16} /> Scan receipt</>
               )}
             </Button>
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              onClick={handleUploadClick}
+              disabled={isScanning}
+              className="flex items-center gap-2"
+            >
+              <Image size={16} /> Upload photo
+            </Button>
             <input
               type="file"
               accept="image/*"
               capture="environment"
               ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              ref={uploadInputRef}
               className="hidden"
               onChange={handleFileChange}
             />
