@@ -16,6 +16,9 @@ import {
   getMonthKey,
 } from "../utils/expenses";
 import { format, parseISO } from "date-fns";
+import { analyzeReceipt } from "../utils/geminiVision";
+import { Camera, Loader2 } from "lucide-react";
+import { useRef } from "react";
 
 function BudgetBar({ label, spent, budget, hint }) {
   const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
@@ -54,6 +57,8 @@ export default function Expenses() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const fileInputRef = useRef(null);
   const monthKey = getMonthKey();
 
   const spent = sumExpenses(transactions, monthKey);
@@ -85,6 +90,44 @@ export default function Expenses() {
   const openLog = () => {
     setEditing(null);
     setModalOpen(true);
+  };
+
+  const handleScanClick = () => {
+    const wantsToScan = window.confirm(
+      "FinTrack needs access to your camera or photo gallery to scan the receipt. Proceed?"
+    );
+    if (wantsToScan) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset input so same file can be scanned again if needed
+    e.target.value = "";
+    setIsScanning(true);
+
+    try {
+      const reader = new FileReader();
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(file);
+      const base64Image = await base64Promise;
+
+      const result = await analyzeReceipt(base64Image, file.type);
+      
+      // Open the modal pre-filled with the scanned data
+      setEditing({ ...result, id: crypto.randomUUID() });
+      setModalOpen(true);
+    } catch (err) {
+      alert("Failed to scan receipt: " + err.message);
+    } finally {
+      setIsScanning(false);
+    }
   };
 
   return (
@@ -219,10 +262,31 @@ export default function Expenses() {
               </tbody>
             </table>
           </div>
-          <div className="mt-4 flex justify-start">
+          <div className="mt-4 flex flex-wrap gap-3 justify-start">
             <Button size="sm" onClick={openLog}>
               Log purchase
             </Button>
+            <Button 
+              size="sm" 
+              variant="secondary" 
+              onClick={handleScanClick}
+              disabled={isScanning}
+              className="flex items-center gap-2"
+            >
+              {isScanning ? (
+                <><Loader2 className="animate-spin" size={16} /> Scanning...</>
+              ) : (
+                <><Camera size={16} /> Scan receipt</>
+              )}
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+            />
           </div>
         </div>
 
