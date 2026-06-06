@@ -267,32 +267,34 @@ export default function Expenses() {
               </tbody>
             </table>
           </div>
-          <div className="mt-4 flex flex-wrap gap-3 justify-start">
-            <Button size="sm" onClick={openLog}>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3 sm:items-center">
+            <Button size="sm" onClick={openLog} className="w-full sm:w-auto justify-center">
               Log purchase
             </Button>
-            <Button 
-              size="sm" 
-              variant="secondary" 
-              onClick={handleScanClick}
-              disabled={isScanning}
-              className="flex items-center gap-2"
-            >
-              {isScanning ? (
-                <><Loader2 className="animate-spin" size={16} /> Scanning...</>
-              ) : (
-                <><Camera size={16} /> Scan receipt</>
-              )}
-            </Button>
-            <Button 
-              size="sm" 
-              variant="secondary" 
-              onClick={handleUploadClick}
-              disabled={isScanning}
-              className="flex items-center gap-2"
-            >
-              <Image size={16} /> Upload photo
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                onClick={handleScanClick}
+                disabled={isScanning}
+                className="flex flex-1 items-center justify-center gap-2 sm:flex-none"
+              >
+                {isScanning ? (
+                  <><Loader2 className="animate-spin" size={16} /> Scanning</>
+                ) : (
+                  <><Camera size={16} /> Scan</>
+                )}
+              </Button>
+              <Button 
+                size="sm" 
+                variant="secondary" 
+                onClick={handleUploadClick}
+                disabled={isScanning}
+                className="flex flex-1 items-center justify-center gap-2 sm:flex-none"
+              >
+                <Image size={16} /> Upload
+              </Button>
+            </div>
             <input
               type="file"
               accept="image/*"
