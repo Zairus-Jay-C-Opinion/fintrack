@@ -79,7 +79,7 @@ export default function Expenses() {
   const monthLabel = format(parseISO(`${monthKey}-01`), "MMMM yyyy");
 
   const handleSubmit = (expense) => {
-    if (editing) {
+    if (editing && !editing.isNew) {
       updateTransaction(editing.id, expense);
     } else {
       addTransaction(expense);
@@ -126,7 +126,7 @@ export default function Expenses() {
       const result = await analyzeReceipt(base64Image, file.type);
       
       // Open the modal pre-filled with the scanned data
-      setEditing({ ...result, id: crypto.randomUUID() });
+      setEditing({ ...result, isNew: true });
       setModalOpen(true);
     } catch (err) {
       alert("Failed to scan receipt: " + err.message);
@@ -338,13 +338,13 @@ export default function Expenses() {
           setModalOpen(false);
           setEditing(null);
         }}
-        title={editing ? "Edit expense" : "Log a purchase"}
+        title={editing && !editing.isNew ? "Edit expense" : "Log a purchase"}
       >
         <AddExpenseForm
           key={editing?.id ?? "new"}
           formId="add-expense-form"
           initialData={editing}
-          submitLabel={editing ? "Save changes" : "Log purchase"}
+          submitLabel={editing && !editing.isNew ? "Save changes" : "Log purchase"}
           onSubmit={handleSubmit}
         />
       </Modal>
