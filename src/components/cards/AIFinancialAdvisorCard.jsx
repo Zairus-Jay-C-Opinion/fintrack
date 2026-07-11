@@ -133,9 +133,9 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
       <div className="relative flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <textarea
-            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-text-secondary/60 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
+            className="w-full max-h-32 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-text-secondary/60 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
             placeholder="E.g., How can I optimize my savings?"
-            rows={1}
+            rows={2}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
