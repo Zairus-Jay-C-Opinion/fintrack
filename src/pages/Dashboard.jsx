@@ -72,7 +72,18 @@ export default function Dashboard() {
         </p>
       </PageHelp>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="mb-4">
+        <AIFinancialAdvisorCard
+          netWorth={netWorth}
+          cashOnHand={cashOnHand}
+          savingsBalance={savingsBalance}
+          investmentPhp={investmentPhp}
+          monthlyIncome={monthlyIncome}
+          allocation={allocation}
+        />
+      </div>
+
+      <div className="grid items-start gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           <MonthlyBarChart
             monthlyIncome={monthlyIncome}
@@ -185,17 +196,6 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-      </div>
-
-      <div className="mt-4">
-        <AIFinancialAdvisorCard
-          netWorth={netWorth}
-          cashOnHand={cashOnHand}
-          savingsBalance={savingsBalance}
-          investmentPhp={investmentPhp}
-          monthlyIncome={monthlyIncome}
-          allocation={allocation}
-        />
       </div>
     </div>
   );

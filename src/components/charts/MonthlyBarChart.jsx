@@ -28,7 +28,7 @@ export default function MonthlyBarChart({ monthlyIncome, transactions = [] }) {
   });
 
   return (
-    <div className="card h-full min-h-[280px]">
+    <div className="card">
       <h3 className="mb-4 font-display text-lg font-semibold text-white">
         Income vs Expenses
       </h3>
