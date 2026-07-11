@@ -38,11 +38,11 @@ const STEPS = [
   {
     targetId: "tour-sidebar",
     navigateTo: "/",
-    preferSide: "top",
+    preferSide: "right",
     icon: LayoutDashboard,
     title: "Welcome — Here's how FinTrack works",
     description:
-      "FinTrack is your personal money command centre. Everything lives in the floating nav bar below. Each icon has a specific job — this tour walks you through each one and explains what to do.",
+      "FinTrack is your personal money command centre. Everything lives in this navigation menu — a rail on larger screens, a bar at the bottom on phones. Each icon has a specific job — this tour walks you through each one and explains what to do.",
   },
 
   // ── B: Core tabs ──────────────────────────────────────

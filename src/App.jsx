@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import FloatingNav from "./components/layout/FloatingNav";
+import { MobileFloatingNav, SidebarRail } from "./components/layout/FloatingNav";
 import PageWrapper from "./components/layout/PageWrapper";
+import { useMediaQuery } from "./hooks/useMediaQuery";
 import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
 import Savings from "./pages/Savings";
@@ -21,6 +22,7 @@ import WalkthroughOverlay from "./components/ui/WalkthroughOverlay";
 function AppRoutes() {
   useNotifications();
   useMarketDataSync();
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
     <MarketChartProvider>
@@ -32,7 +34,7 @@ function AppRoutes() {
         <div className="ambient-orb-2" />
         <div className="ambient-noise" />
       </div>
-      <div className="relative z-10 flex h-[100dvh] max-h-[100dvh] w-full max-w-full flex-col overflow-hidden pt-[env(safe-area-inset-top)]">
+      <div className="relative z-10 flex h-[100dvh] max-h-[100dvh] w-full max-w-full flex-col overflow-hidden pt-[env(safe-area-inset-top)] md:pl-24">
         <main className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden">
           <PageWrapper>
             <Routes>
@@ -49,7 +51,7 @@ function AppRoutes() {
           </PageWrapper>
         </main>
       </div>
-      <FloatingNav />
+      {isDesktop ? <SidebarRail /> : <MobileFloatingNav />}
       {/* Walkthrough system — renders via portals above everything */}
       <WelcomeModal />
       <SetupModal />

@@ -1,18 +1,26 @@
+import { Link } from "react-router-dom";
 import TopBar from "../components/layout/TopBar";
 import PageHelp from "../components/ui/PageHelp";
 import StatCard from "../components/cards/StatCard";
 import AllocationCard from "../components/cards/AllocationCard";
 import NetWorthCard from "../components/cards/NetWorthCard";
 import MonthlyBarChart from "../components/charts/MonthlyBarChart";
-import PortfolioGrowthChart from "../components/charts/PortfolioGrowthChart";
 import AIFinancialAdvisorCard from "../components/cards/AIFinancialAdvisorCard";
 import { useNetWorth } from "../hooks/useNetWorth";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { useFinanceStore } from "../store/useFinanceStore";
 import { formatPhp } from "../utils/currency";
+import { formatDate } from "../utils/formatters";
 import { getNextPayday, daysUntil } from "../utils/finance";
+import { sumExpenses, getMonthKey } from "../utils/expenses";
 import { format } from "date-fns";
-import { Calendar, ArrowRight, Wallet, PiggyBank, TrendingUp } from "lucide-react";
+import {
+  Calendar,
+  ArrowRight,
+  Receipt,
+  ChevronRight,
+  Plus,
+} from "lucide-react";
 import { useMemo } from "react";
 
 export default function Dashboard() {
@@ -33,42 +41,61 @@ export default function Dashboard() {
         ? `Paid on days ${paydays.join(" & ")}`
         : "Set payday in Settings";
   const transactions = useFinanceStore((s) => s.transactions);
-  const purchases = useFinanceStore((s) => s.investmentPurchases);
 
   const nextPayday = getNextPayday(paydays);
   const days = daysUntil(nextPayday);
 
-  const portfolioChartData = useMemo(() => {
-    const sorted = [...purchases].sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
-    );
-    let cumulative = 0;
-    return sorted.map((p) => {
-      cumulative += p.totalPHP;
-      return {
-        label: format(new Date(p.date), "MMM yy"),
-        value: cumulative,
-      };
-    });
-  }, [purchases]);
+  const spentThisMonth = sumExpenses(transactions, getMonthKey());
+
+  const recentTransactions = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.type === "expense")
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5),
+    [transactions]
+  );
 
   return (
     <div>
-        <TopBar
-          title="Dashboard"
-          subtitle="Your complete financial picture at a glance"
-        />
+      <TopBar
+        title="Dashboard"
+        subtitle="Your complete financial picture at a glance"
+      />
 
-        <PageHelp title="How the Dashboard works">
-          <p>
-            Net worth = cash + savings balance + investments (in PHP). Income is
-            split by your allocation % into investments, savings, and spending —
-            each bucket is separate. Charts summarize trends; log data on other
-            tabs to populate them.
-          </p>
-        </PageHelp>
+      <PageHelp title="How the Dashboard works">
+        <p>
+          Net worth = cash + savings balance + investments (in PHP). Income is
+          split by your allocation % into investments, savings, and spending —
+          each bucket is separate. Charts summarize trends; log data on other
+          tabs to populate them.
+        </p>
+      </PageHelp>
 
-        <div className="mb-6">
+      <div className="grid gap-4 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
+          <MonthlyBarChart
+            monthlyIncome={monthlyIncome}
+            transactions={transactions}
+          />
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <AllocationCard allocation={allocation} amounts={allocAmounts} />
+            <StatCard
+              icon={Calendar}
+              label="This Month's Income"
+              value={formatPhp(monthlyIncome)}
+              sub={paydayLabel}
+            />
+            <StatCard
+              icon={Receipt}
+              label="Spent this month"
+              value={formatPhp(spentThisMonth)}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-4">
           <NetWorthCard
             netWorth={netWorth}
             breakdown={[
@@ -76,62 +103,58 @@ export default function Dashboard() {
               { label: "Savings", value: formatPhp(savingsBalance) },
               { label: "Investments", value: formatPhp(investmentPhp) },
             ]}
+            action={
+              <Link
+                to="/expenses"
+                title="Log expense"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-bg-deepest shadow-lg transition-transform hover:scale-105"
+              >
+                <Plus size={18} />
+              </Link>
+            }
           />
-        </div>
 
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            index={0}
-            icon={Wallet}
-            label="Total Net Worth"
-            value={formatPhp(netWorth)}
-          />
-          <StatCard
-            index={1}
-            icon={Calendar}
-            label="This Month's Income"
-            value={formatPhp(monthlyIncome)}
-            sub={paydayLabel}
-          />
-          <StatCard
-            index={2}
-            icon={PiggyBank}
-            label="Savings Balance"
-            value={formatPhp(savingsBalance)}
-          />
-          <StatCard
-            index={3}
-            icon={TrendingUp}
-            label="Investment Value"
-            value={formatPhp(investmentPhp)}
-            sub="PHP equivalent"
-          />
-        </div>
-
-        <div className="mb-6">
-          <AIFinancialAdvisorCard
-            netWorth={netWorth}
-            cashOnHand={cashOnHand}
-            savingsBalance={savingsBalance}
-            investmentPhp={investmentPhp}
-            monthlyIncome={monthlyIncome}
-            allocation={allocation}
-          />
-        </div>
-
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <AllocationCard allocation={allocation} amounts={allocAmounts} />
-          <MonthlyBarChart
-            monthlyIncome={monthlyIncome}
-            transactions={transactions}
-          />
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <PortfolioGrowthChart data={portfolioChartData} />
+          <div className="card">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-display text-lg font-semibold text-white">
+                Transactions
+              </h3>
+              <Link
+                to="/expenses"
+                className="flex items-center gap-0.5 text-xs text-highlight hover:underline"
+              >
+                View all <ChevronRight size={14} />
+              </Link>
+            </div>
+            <ul className="space-y-3">
+              {recentTransactions.length === 0 ? (
+                <li className="text-sm text-text-secondary">
+                  No transactions yet
+                </li>
+              ) : (
+                recentTransactions.map((t) => (
+                  <li key={t.id} className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5 text-text-secondary">
+                      <Receipt size={16} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-white">
+                        {t.item || t.note || t.category || "Expense"}
+                      </p>
+                      <p className="text-xs text-text-secondary">
+                        {formatDate(t.date)}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm text-loss">
+                      -{formatPhp(t.amount)}
+                    </span>
+                  </li>
+                ))
+              )}
+            </ul>
           </div>
-          <div className="card flex flex-col justify-center border-highlight/20 bg-gradient-to-br from-highlight/10 to-transparent">
+
+          <div className="card border-highlight/20 bg-gradient-to-br from-highlight/10 to-transparent">
             <div className="flex items-center gap-2 text-highlight">
               <Calendar size={20} />
               <span className="font-display font-semibold text-white">
@@ -140,7 +163,7 @@ export default function Dashboard() {
             </div>
             {nextPayday ? (
               <>
-                <p className="mt-4 font-mono text-3xl text-white">
+                <p className="mt-4 text-3xl text-white">
                   {days} {days === 1 ? "day" : "days"}
                 </p>
                 <p className="mt-1 text-sm text-text-secondary">
@@ -163,5 +186,17 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <div className="mt-4">
+        <AIFinancialAdvisorCard
+          netWorth={netWorth}
+          cashOnHand={cashOnHand}
+          savingsBalance={savingsBalance}
+          investmentPhp={investmentPhp}
+          monthlyIncome={monthlyIncome}
+          allocation={allocation}
+        />
+      </div>
+    </div>
   );
 }

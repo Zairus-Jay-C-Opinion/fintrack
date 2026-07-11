@@ -24,7 +24,7 @@ export default {
       fontFamily: {
         display: ["Outfit", "sans-serif"],
         body: ["Outfit", "sans-serif"],
-        mono: ["Space Mono", "monospace"],
+        mono: ["Outfit", "sans-serif"],
       },
       borderRadius: {
         xl: "20px",

@@ -21,7 +21,8 @@ const NAV_ITEMS = [
   { to: "/settings", icon: Settings, label: "Settings", tourId: "tour-settings" },
 ];
 
-export default function FloatingNav() {
+/** Bottom floating pill nav — used on narrow (mobile) viewports. */
+export function MobileFloatingNav() {
   return (
     <nav
       data-tour="tour-sidebar"
@@ -44,6 +45,38 @@ export default function FloatingNav() {
         >
           <Icon size={19} strokeWidth={2.25} />
           <span className="pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 scale-90 whitespace-nowrap rounded-lg border border-white/10 bg-bg-dark px-2 py-1 text-xs text-white opacity-0 shadow-elevated transition-all duration-150 group-hover:scale-100 group-hover:opacity-100">
+            {label}
+          </span>
+        </NavLink>
+      ))}
+    </nav>
+  );
+}
+
+/** Vertical floating rail — used on desktop/tablet viewports (md and up). */
+export function SidebarRail() {
+  return (
+    <nav
+      data-tour="tour-sidebar"
+      className="fixed left-4 top-1/2 z-40 flex -translate-y-1/2 flex-col items-center gap-1 rounded-full border border-white/10 bg-bg-dark/80 p-2 shadow-elevated backdrop-blur-xl"
+    >
+      {NAV_ITEMS.map(({ to, icon: Icon, label, tourId }) => (
+        <NavLink
+          key={to}
+          to={to}
+          end={to === "/"}
+          data-tour={tourId}
+          title={label}
+          className={({ isActive }) =>
+            `group relative flex shrink-0 items-center justify-center rounded-full p-3 transition-all duration-200 ${
+              isActive
+                ? "bg-highlight/15 text-highlight shadow-[0_0_14px_rgba(16,185,129,0.35)]"
+                : "text-text-secondary hover:bg-white/5 hover:text-white"
+            }`
+          }
+        >
+          <Icon size={19} strokeWidth={2.25} />
+          <span className="pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 scale-90 whitespace-nowrap rounded-lg border border-white/10 bg-bg-dark px-2 py-1 text-xs text-white opacity-0 shadow-elevated transition-all duration-150 group-hover:scale-100 group-hover:opacity-100">
             {label}
           </span>
         </NavLink>
