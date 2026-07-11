@@ -75,8 +75,8 @@ export default defineConfig(({ mode }) => {
           name: "FinTrack",
           short_name: "FinTrack",
           description: "Your personal financial dashboard",
-          theme_color: "#06141b",
-          background_color: "#06141b",
+          theme_color: "#050f0d",
+          background_color: "#050f0d",
           display: "standalone",
           icons: [
             {

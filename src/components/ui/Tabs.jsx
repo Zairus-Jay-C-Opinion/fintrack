@@ -1,14 +1,14 @@
 export default function Tabs({ tabs, active, onChange }) {
   return (
-    <div className="flex flex-wrap gap-2 border-b border-accent pb-2">
+    <div className="flex flex-wrap gap-1.5 rounded-full border border-white/10 bg-white/5 p-1.5">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"
           onClick={() => onChange(tab.id)}
-          className={`rounded-[var(--radius-sm)] px-4 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
             active === tab.id
-              ? "bg-bg-mid text-white"
+              ? "bg-highlight text-bg-deepest shadow-[0_0_12px_rgba(16,185,129,0.35)]"
               : "text-text-secondary hover:text-text-primary"
           }`}
         >

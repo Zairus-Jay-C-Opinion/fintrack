@@ -16,7 +16,13 @@ export default function SavingsInterestChart({ data }) {
   return (
     <ResponsiveContainer width="100%" height={240}>
       <AreaChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.gridColor} />
+        <defs>
+          <linearGradient id="savingsInterestFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={chartTheme.gain} stopOpacity={0.35} />
+            <stop offset="95%" stopColor={chartTheme.gain} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.gridColor} vertical={false} />
         <XAxis
           dataKey="label"
           stroke={chartTheme.axisColor}
@@ -31,6 +37,7 @@ export default function SavingsInterestChart({ data }) {
           contentStyle={{
             background: chartTheme.tooltipBg,
             border: `1px solid ${chartTheme.tooltipBorder}`,
+            borderRadius: 16,
           }}
         />
         <Area
@@ -38,8 +45,8 @@ export default function SavingsInterestChart({ data }) {
           dataKey="balance"
           name="Projected balance"
           stroke={chartTheme.gain}
-          fill={chartTheme.gain}
-          fillOpacity={0.2}
+          strokeWidth={2.5}
+          fill="url(#savingsInterestFill)"
         />
       </AreaChart>
     </ResponsiveContainer>

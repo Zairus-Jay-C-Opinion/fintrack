@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Receipt, Wallet, Target, PiggyBank } from "lucide-react";
 import TopBar from "../components/layout/TopBar";
 import PageHelp from "../components/ui/PageHelp";
 import StatCard from "../components/cards/StatCard";
@@ -31,7 +31,7 @@ function BudgetBar({ label, spent, budget, hint }) {
           {formatPhp(spent)} / {formatPhp(budget)}
         </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-bg-mid">
+      <div className="h-2 overflow-hidden rounded-full bg-white/10">
         <div
           className={`h-full rounded-full transition-all ${over ? "bg-loss" : "bg-highlight"}`}
           style={{ width: `${pct}%` }}
@@ -165,18 +165,21 @@ export default function Expenses() {
       </PageHelp>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Spent this month" value={formatPhp(spent)} />
+        <StatCard icon={Receipt} label="Spent this month" value={formatPhp(spent)} />
         <StatCard
+          icon={Target}
           label="Spending budget"
           value={formatPhp(spendingBudget)}
           sub={`${(allocation.spending * 100).toFixed(0)}% of income`}
         />
         <StatCard
+          icon={PiggyBank}
           label="Savings target (monthly)"
           value={formatPhp(savingsBudget)}
           sub="Set aside on payday — separate from expenses"
         />
         <StatCard
+          icon={Wallet}
           label="Left to spend"
           value={formatPhp(Math.max(0, spendingBudget - spent))}
           sub={spent > spendingBudget ? "Over spending budget" : "On track"}
@@ -206,38 +209,44 @@ export default function Expenses() {
           <h3 className="font-display text-lg font-semibold text-white">
             Purchase log
           </h3>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-accent text-text-secondary">
-                  <th className="pb-2 pr-3">Date</th>
-                  <th className="pb-2 pr-3">Item</th>
-                  <th className="pb-2 pr-3">Category</th>
-                  <th className="pb-2 pr-3">Amount</th>
-                  <th className="pb-2 w-20" />
-                </tr>
-              </thead>
-              <tbody>
-                {monthExpenses.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="py-6 text-text-secondary">
-                      No expenses logged for {monthLabel}
-                    </td>
+          {monthExpenses.length === 0 ? (
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] py-12 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-text-secondary/60">
+                <Receipt className="h-8 w-8" />
+              </div>
+              <h4 className="mb-1 font-medium text-white">No expenses yet</h4>
+              <p className="text-sm text-text-secondary">
+                Log your first purchase for {monthLabel} to see it here.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/5 text-text-secondary">
+                    <th className="px-3 py-3">Date</th>
+                    <th className="px-3 py-3">Item</th>
+                    <th className="px-3 py-3">Category</th>
+                    <th className="px-3 py-3">Amount</th>
+                    <th className="w-20 px-3 py-3" />
                   </tr>
-                ) : (
-                  monthExpenses.map((e) => (
-                    <tr key={e.id} className="border-b border-accent/50">
-                      <td className="py-3 pr-3">{formatDate(e.date)}</td>
-                      <td className="py-3 pr-3 text-white">
+                </thead>
+                <tbody>
+                  {monthExpenses.map((e) => (
+                    <tr key={e.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
+                      <td className="whitespace-nowrap px-3 py-3 text-text-secondary">{formatDate(e.date)}</td>
+                      <td className="px-3 py-3 text-white">
                         {e.item || e.note || "—"}
                       </td>
-                      <td className="py-3 pr-3 text-text-secondary">
-                        {e.category || "Other"}
+                      <td className="px-3 py-3">
+                        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-text-secondary">
+                          {e.category || "Other"}
+                        </span>
                       </td>
-                      <td className="py-3 pr-3 font-mono text-loss">
+                      <td className="px-3 py-3 font-mono text-loss">
                         {formatPhp(e.amount)}
                       </td>
-                      <td className="py-3">
+                      <td className="px-3 py-3">
                         <div className="flex gap-1">
                           <button
                             type="button"
@@ -245,7 +254,7 @@ export default function Expenses() {
                               setEditing(e);
                               setModalOpen(true);
                             }}
-                            className="rounded p-1 text-text-secondary hover:text-white"
+                            className="rounded-full p-1.5 text-text-secondary hover:bg-white/5 hover:text-white"
                           >
                             <Pencil size={16} />
                           </button>
@@ -255,18 +264,18 @@ export default function Expenses() {
                               if (confirm("Delete this expense?"))
                                 removeTransaction(e.id);
                             }}
-                            className="rounded p-1 text-text-secondary hover:text-loss"
+                            className="rounded-full p-1.5 text-text-secondary hover:bg-loss/10 hover:text-loss"
                           >
                             <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:gap-3 sm:items-center">
             <Button size="sm" onClick={openLog} className="w-full sm:w-auto justify-center">
               Log purchase

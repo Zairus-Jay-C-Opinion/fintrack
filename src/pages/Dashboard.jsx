@@ -12,7 +12,7 @@ import { useFinanceStore } from "../store/useFinanceStore";
 import { formatPhp } from "../utils/currency";
 import { getNextPayday, daysUntil } from "../utils/finance";
 import { format } from "date-fns";
-import { Calendar, ArrowRight } from "lucide-react";
+import { Calendar, ArrowRight, Wallet, PiggyBank, TrendingUp } from "lucide-react";
 import { useMemo } from "react";
 
 export default function Dashboard() {
@@ -82,22 +82,26 @@ export default function Dashboard() {
         <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             index={0}
+            icon={Wallet}
             label="Total Net Worth"
             value={formatPhp(netWorth)}
           />
           <StatCard
             index={1}
+            icon={Calendar}
             label="This Month's Income"
             value={formatPhp(monthlyIncome)}
             sub={paydayLabel}
           />
           <StatCard
             index={2}
+            icon={PiggyBank}
             label="Savings Balance"
             value={formatPhp(savingsBalance)}
           />
           <StatCard
             index={3}
+            icon={TrendingUp}
             label="Investment Value"
             value={formatPhp(investmentPhp)}
             sub="PHP equivalent"
@@ -127,7 +131,7 @@ export default function Dashboard() {
           <div className="lg:col-span-2">
             <PortfolioGrowthChart data={portfolioChartData} />
           </div>
-          <div className="card flex flex-col justify-center">
+          <div className="card flex flex-col justify-center border-highlight/20 bg-gradient-to-br from-highlight/10 to-transparent">
             <div className="flex items-center gap-2 text-highlight">
               <Calendar size={20} />
               <span className="font-display font-semibold text-white">
@@ -142,7 +146,7 @@ export default function Dashboard() {
                 <p className="mt-1 text-sm text-text-secondary">
                   {format(nextPayday, "EEEE, MMM d")}
                 </p>
-                <div className="mt-6 rounded-[var(--radius-md)] border border-accent bg-bg-deepest p-4">
+                <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
                   <p className="text-xs text-text-secondary">Recommended action</p>
                   <p className="mt-2 text-sm text-text-primary">
                     Allocate {formatPhp(allocAmounts.investments)} to ETF DCA and{" "}

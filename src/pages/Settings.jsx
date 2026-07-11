@@ -194,7 +194,7 @@ export default function Settings() {
             onChange={(e) => setMonthlyIncome(parseFloat(e.target.value) || 0)}
           />
 
-          <div className="relative rounded-[var(--radius-md)] border border-accent bg-bg-deepest p-4 pb-14">
+          <div className="relative rounded-2xl border border-white/10 bg-white/5 p-4 pb-14">
             <p className="text-sm font-medium text-white">Pay schedule</p>
             <p className="mt-1 text-xs text-text-secondary">
               Enter one payday per month, or add a second if you&apos;re paid twice.

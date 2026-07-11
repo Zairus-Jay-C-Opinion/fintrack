@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, DollarSign, TrendingUp, Wallet, Calendar } from "lucide-react";
 import TopBar from "../components/layout/TopBar";
 import PageHelp from "../components/ui/PageHelp";
 import Tabs from "../components/ui/Tabs";
@@ -142,19 +142,22 @@ export default function Investments() {
       )}
 
       <div className="mb-4 grid grid-cols-2 gap-2 min-w-0 sm:gap-4 lg:grid-cols-4">
-        <StatCard label="Total Invested" value={formatUsd(totalInvested)} sub="What you paid" />
+        <StatCard icon={DollarSign} label="Total Invested" value={formatUsd(totalInvested)} sub="What you paid" />
         <StatCard
+          icon={Wallet}
           label="Current Value"
           value={formatUsd(currentValue)}
           sub={formatPhp(usdToPhp(currentValue, phpUsdRate))}
         />
         <StatCard
+          icon={TrendingUp}
           label="Unrealized P/L"
           value={formatUsd(gain)}
           trend={gainPct}
           sub="Paper gain/loss if sold today"
         />
         <StatCard
+          icon={Calendar}
           label="Monthly DCA"
           value={formatPhp(dcaAmount)}
           sub="Planned investment per month"
@@ -167,33 +170,32 @@ export default function Investments() {
             Holdings
           </h3>
           {holdings.length === 0 ? (
-            <p className="mt-4 text-sm text-text-secondary">No purchases yet</p>
+            <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] py-10 text-center">
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-white/5 text-text-secondary/60">
+                <TrendingUp className="h-7 w-7" />
+              </div>
+              <h4 className="mb-1 font-medium text-white">No investments yet</h4>
+              <p className="text-sm text-text-secondary">Log a stock or ETF purchase to see it here.</p>
+            </div>
           ) : (
-          <div className="mt-4 max-w-full overflow-x-auto overscroll-x-contain">
+          <div className="mt-4 max-w-full overflow-x-auto overscroll-x-contain rounded-2xl border border-white/10">
             <table className="w-full min-w-[520px] text-left text-xs sm:text-sm">
               <thead>
-                <tr className="border-b border-accent text-text-secondary">
-                  <th className="pb-2 pr-2">Symbol</th>
-                  <th className="hidden pb-2 pr-2 sm:table-cell">Type</th>
-                  <th className="pb-2 pr-2">Shares</th>
-                  <th className="pb-2 pr-2">Avg</th>
-                  <th className="pb-2 pr-2">Price</th>
-                  <th className="pb-2 pr-2">Value</th>
-                  <th className="pb-2 pr-2">Gain</th>
-                  <th className="pb-2 w-10" />
+                <tr className="border-b border-white/10 bg-white/5 text-text-secondary">
+                  <th className="px-2 py-3">Symbol</th>
+                  <th className="hidden px-2 py-3 sm:table-cell">Type</th>
+                  <th className="px-2 py-3">Shares</th>
+                  <th className="px-2 py-3">Avg</th>
+                  <th className="px-2 py-3">Price</th>
+                  <th className="px-2 py-3">Value</th>
+                  <th className="px-2 py-3">Gain</th>
+                  <th className="w-10 px-2 py-3" />
                 </tr>
               </thead>
               <tbody>
-                {holdings.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="py-4 text-text-secondary">
-                      No purchases recorded
-                    </td>
-                  </tr>
-                ) : (
-                  holdings.map((h) => (
-                    <tr key={h.ticker} className="border-b border-accent/50">
-                      <td className="py-3 pr-3 font-medium text-white">
+                {holdings.map((h) => (
+                    <tr key={h.ticker} className="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
+                      <td className="py-3 pr-3 pl-2 font-medium text-white">
                         {h.ticker}
                       </td>
                       <td className="hidden py-3 pr-2 text-text-secondary sm:table-cell">
@@ -219,19 +221,18 @@ export default function Investments() {
                       >
                         {formatUsd(h.gain)} ({h.gainPct.toFixed(1)}%)
                       </td>
-                      <td className="py-3">
+                      <td className="py-3 pr-2">
                         <button
                           type="button"
                           onClick={() => setEditingHolding(h)}
-                          className="rounded p-1 text-text-secondary hover:bg-bg-mid hover:text-white"
+                          className="rounded-full p-1.5 text-text-secondary hover:bg-white/5 hover:text-white"
                           title="Edit holding"
                         >
                           <Pencil size={16} />
                         </button>
                       </td>
                     </tr>
-                  ))
-                )}
+                ))}
               </tbody>
             </table>
           </div>
@@ -245,7 +246,7 @@ export default function Investments() {
 
         <div className="space-y-4 min-w-0">
 
-          <div className="card">
+          <div className="card border-highlight/20 bg-gradient-to-br from-highlight/10 to-transparent">
             <h3 className="font-display font-semibold text-white">DCA Tracker</h3>
             <p className="mt-2 text-sm text-text-secondary">
               Next contribution in {daysUntil(nextPayday) ?? "—"} days
@@ -404,47 +405,45 @@ export default function Investments() {
         <h3 className="font-display text-lg font-semibold text-white">
           Purchase history
         </h3>
-        <div className="mt-4 max-w-full overflow-x-auto">
+        {purchases.length === 0 ? (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] py-10 text-center">
+            <p className="text-sm text-text-secondary">No purchases yet</p>
+          </div>
+        ) : (
+        <div className="mt-4 max-w-full overflow-x-auto rounded-2xl border border-white/10">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-accent text-text-secondary">
-                <th className="pb-2 pr-3">Date</th>
-                <th className="pb-2 pr-3">Symbol</th>
-                <th className="pb-2 pr-3">Type</th>
-                <th className="pb-2 pr-3">Shares</th>
-                <th className="pb-2 pr-3">Total USD</th>
-                <th className="pb-2 pr-3">Note</th>
-                <th className="pb-2 w-20" />
+              <tr className="border-b border-white/10 bg-white/5 text-text-secondary">
+                <th className="px-3 py-3">Date</th>
+                <th className="px-3 py-3">Symbol</th>
+                <th className="px-3 py-3">Type</th>
+                <th className="px-3 py-3">Shares</th>
+                <th className="px-3 py-3">Total USD</th>
+                <th className="px-3 py-3">Note</th>
+                <th className="w-20 px-3 py-3" />
               </tr>
             </thead>
             <tbody>
-              {purchases.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-4 text-text-secondary">
-                    No purchases yet
-                  </td>
-                </tr>
-              ) : (
-                purchases.map((p) => (
-                  <tr key={p.id} className="border-b border-accent/50">
-                    <td className="py-3 pr-3">{formatDate(p.date)}</td>
-                    <td className="py-3 pr-3 font-medium text-white">
+              {purchases.map((p) => (
+                  <tr key={p.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
+                    <td className="whitespace-nowrap px-3 py-3 text-text-secondary">{formatDate(p.date)}</td>
+                    <td className="px-3 py-3 font-medium text-white">
                       {p.ticker}
                     </td>
-                    <td className="py-3 pr-3 text-text-secondary">
+                    <td className="px-3 py-3 text-text-secondary">
                       {p.assetType || "—"}
                     </td>
-                    <td className="py-3 pr-3 font-mono">{p.shares}</td>
-                    <td className="py-3 pr-3 font-mono">
+                    <td className="px-3 py-3 font-mono">{p.shares}</td>
+                    <td className="px-3 py-3 font-mono">
                       {formatUsd(p.totalUSD)}
                     </td>
-                    <td className="py-3 pr-3 text-text-secondary">{p.note}</td>
-                    <td className="py-3">
+                    <td className="px-3 py-3 text-text-secondary">{p.note}</td>
+                    <td className="px-3 py-3">
                       <div className="flex gap-1">
                         <button
                           type="button"
                           onClick={() => openEdit(p)}
-                          className="rounded p-1 text-text-secondary hover:bg-bg-mid hover:text-white"
+                          className="rounded-full p-1.5 text-text-secondary hover:bg-white/5 hover:text-white"
                           title="Edit"
                         >
                           <Pencil size={16} />
@@ -452,7 +451,7 @@ export default function Investments() {
                         <button
                           type="button"
                           onClick={() => handleDelete(p.id)}
-                          className="rounded p-1 text-text-secondary hover:bg-bg-mid hover:text-loss"
+                          className="rounded-full p-1.5 text-text-secondary hover:bg-loss/10 hover:text-loss"
                           title="Delete"
                         >
                           <Trash2 size={16} />
@@ -460,11 +459,11 @@ export default function Investments() {
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
+        )}
       </div>
 
       <Modal

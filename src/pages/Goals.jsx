@@ -6,6 +6,7 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import Modal from "../components/ui/Modal";
 import StatCard from "../components/cards/StatCard";
+import { Target, Coins, Wallet } from "lucide-react";
 import { useFinanceStore } from "../store/useFinanceStore";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { formatPhp } from "../utils/currency";
@@ -123,31 +124,37 @@ export default function Goals() {
       </PageHelp>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard label="Goals" value={String(savingsGoals.length)} />
-        <StatCard label="Total saved" value={formatPhp(totalSaved)} />
-        <StatCard label="Combined targets" value={formatPhp(totalTarget)} />
+        <StatCard icon={Target} label="Goals" value={String(savingsGoals.length)} />
+        <StatCard icon={Wallet} label="Total saved" value={formatPhp(totalSaved)} />
+        <StatCard icon={Coins} label="Combined targets" value={formatPhp(totalTarget)} />
       </div>
 
+      {savingsGoals.length === 0 ? (
+        <div className="mb-6 rounded-3xl border border-white/10 bg-white/[0.02] py-16 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-text-secondary/60">
+            <Target className="h-8 w-8" />
+          </div>
+          <h4 className="mb-2 text-lg font-medium text-white">No goals set</h4>
+          <p className="mx-auto mb-6 max-w-sm text-sm text-text-secondary">
+            Define what you're saving for to stay motivated and track your progress.
+          </p>
+          <Button onClick={() => setGoalModal(true)}>Create your first goal</Button>
+        </div>
+      ) : (
       <div className="card mb-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {savingsGoals.length === 0 ? (
-            <p className="text-text-secondary sm:col-span-2 lg:col-span-3">
-              No goals yet — add your first goal below
-            </p>
-          ) : (
-            savingsGoals.map((g) => (
-              <GoalCard
-                key={g.id}
-                goal={g}
-                onDelete={removeSavingsGoal}
-                onUpdateProgress={(goal) => {
-                  setEditingGoal(goal);
-                  setProgressInput(String(goal.current));
-                  setProgressModal(true);
-                }}
-              />
-            ))
-          )}
+          {savingsGoals.map((g) => (
+            <GoalCard
+              key={g.id}
+              goal={g}
+              onDelete={removeSavingsGoal}
+              onUpdateProgress={(goal) => {
+                setEditingGoal(goal);
+                setProgressInput(String(goal.current));
+                setProgressModal(true);
+              }}
+            />
+          ))}
         </div>
         <div className="mt-4 flex flex-wrap justify-start gap-3">
           <Button size="sm" onClick={() => setGoalModal(true)}>
@@ -163,6 +170,7 @@ export default function Goals() {
           </Button>
         </div>
       </div>
+      )}
 
       <Modal
         open={goalModal}

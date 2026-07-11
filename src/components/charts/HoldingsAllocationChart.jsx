@@ -9,7 +9,7 @@ import {
 import { chartTheme } from "../../constants/chartTheme";
 import { formatUsd } from "../../utils/currency";
 
-const COLORS = ["#5B8FA8", "#4CAF7D", "#D4A843", "#9BA8AB", "#E05C5C", "#8B6BB1"];
+const COLORS = ["#10B981", "#84CC16", "#FBBF24", "#22D3D3", "#F87171", "#A78BFA"];
 
 export default function HoldingsAllocationChart({ holdings }) {
   const data = holdings

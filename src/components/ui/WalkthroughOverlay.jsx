@@ -38,11 +38,11 @@ const STEPS = [
   {
     targetId: "tour-sidebar",
     navigateTo: "/",
-    preferSide: "right",
+    preferSide: "top",
     icon: LayoutDashboard,
     title: "Welcome — Here's how FinTrack works",
     description:
-      "FinTrack is your personal money command centre. Everything lives in the sidebar on the left. Each section has a specific job — this tour walks you through each one and explains what to do.",
+      "FinTrack is your personal money command centre. Everything lives in the floating nav bar below. Each icon has a specific job — this tour walks you through each one and explains what to do.",
   },
 
   // ── B: Core tabs ──────────────────────────────────────
@@ -408,7 +408,7 @@ export default function WalkthroughOverlay() {
                   height={spotlightRect.height + SVG_PAD * 2}
                   rx="10"
                   fill="none"
-                  stroke="#5b8fa8"
+                  stroke="#10b981"
                   strokeWidth="2"
                   animate={{ opacity: [0.9, 0.25, 0.9] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}

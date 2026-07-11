@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, PiggyBank, Target, ShieldCheck, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import TopBar from "../components/layout/TopBar";
 import PageHelp from "../components/ui/PageHelp";
 import StatCard from "../components/cards/StatCard";
@@ -159,7 +159,7 @@ export default function Savings() {
           <label className="block text-sm text-text-secondary">
             Bank
             <select
-              className="mt-1.5 w-full rounded-[var(--radius-sm)] border border-accent bg-bg-deepest px-3 py-2 text-text-primary"
+              className="field-input field-select mt-1.5"
               value={savingsBank}
               onChange={(e) => setSavingsBank(e.target.value)}
             >
@@ -181,13 +181,14 @@ export default function Savings() {
       </div>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <StatCard label={`${bankName} balance`} value={formatPhp(savingsBalance)} />
+        <StatCard icon={PiggyBank} label={`${bankName} balance`} value={formatPhp(savingsBalance)} />
         <StatCard
+          icon={Target}
           label="Monthly savings target"
           value={formatPhp(monthlySavings)}
           sub={`${(allocation.savings * 100).toFixed(0)}% of income`}
         />
-        <StatCard label="Emergency fund" value={formatPhp(emergencyFund)} />
+        <StatCard icon={ShieldCheck} label="Emergency fund" value={formatPhp(emergencyFund)} />
       </div>
 
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
@@ -310,48 +311,65 @@ export default function Savings() {
             Log entry
           </Button>
         </div>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-accent text-text-secondary">
-                <th className="pb-2 pr-4">Date</th>
-                <th className="pb-2 pr-4">Type</th>
-                <th className="pb-2 pr-4">Amount</th>
-                <th className="pb-2 pr-4">Balance after</th>
-                <th className="pb-2 pr-4">Note</th>
-                <th className="pb-2 w-20" />
-              </tr>
-            </thead>
-            <tbody>
-              {savingsEntries.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-4 text-text-secondary">
-                    No entries yet — record a deposit to start
-                  </td>
+        {savingsEntries.length === 0 ? (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] py-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-text-secondary/60">
+              <PiggyBank className="h-8 w-8" />
+            </div>
+            <h4 className="mb-1 font-medium text-white">No entries yet</h4>
+            <p className="text-sm text-text-secondary">Record a deposit to get started.</p>
+          </div>
+        ) : (
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/5 text-text-secondary">
+                  <th className="px-4 py-3">Date</th>
+                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Amount</th>
+                  <th className="px-4 py-3">Balance after</th>
+                  <th className="px-4 py-3">Note</th>
+                  <th className="w-20 px-4 py-3" />
                 </tr>
-              ) : (
-                savingsEntries.map((e) => (
-                  <tr key={e.id} className="border-b border-accent/50">
-                    <td className="py-3 pr-4">{formatDate(e.date)}</td>
-                    <td className="py-3 pr-4 capitalize">{e.type}</td>
+              </thead>
+              <tbody>
+                {savingsEntries.map((e) => (
+                  <tr key={e.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
+                    <td className="whitespace-nowrap px-4 py-3 text-text-secondary">{formatDate(e.date)}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs capitalize ${
+                          e.type === "deposit"
+                            ? "border-gain/20 bg-gain/10 text-gain"
+                            : "border-loss/20 bg-loss/10 text-loss"
+                        }`}
+                      >
+                        {e.type === "deposit" ? (
+                          <ArrowDownToLine size={12} />
+                        ) : (
+                          <ArrowUpFromLine size={12} />
+                        )}
+                        {e.type}
+                      </span>
+                    </td>
                     <td
-                      className={`py-3 pr-4 font-mono ${
+                      className={`px-4 py-3 font-mono ${
                         e.type === "deposit" ? "text-gain" : "text-loss"
                       }`}
                     >
                       {e.type === "deposit" ? "+" : "-"}
                       {formatPhp(e.amount)}
                     </td>
-                    <td className="py-3 pr-4 font-mono text-white">
+                    <td className="px-4 py-3 font-mono text-white">
                       {formatPhp(e.balance)}
                     </td>
-                    <td className="py-3 pr-4 text-text-secondary">{e.note}</td>
-                    <td className="py-3">
+                    <td className="px-4 py-3 text-text-secondary">{e.note}</td>
+                    <td className="px-4 py-3">
                       <div className="flex gap-1">
                         <button
                           type="button"
                           onClick={() => openEditEntry(e)}
-                          className="rounded p-1 text-text-secondary hover:text-white"
+                          className="rounded-full p-1.5 text-text-secondary hover:bg-white/5 hover:text-white"
                         >
                           <Pencil size={16} />
                         </button>
@@ -361,18 +379,18 @@ export default function Savings() {
                             if (confirm("Delete this entry?"))
                               removeSavingsEntry(e.id);
                           }}
-                          className="rounded p-1 text-text-secondary hover:text-loss"
+                          className="rounded-full p-1.5 text-text-secondary hover:bg-loss/10 hover:text-loss"
                         >
                           <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <Modal
@@ -391,7 +409,7 @@ export default function Savings() {
           <label className="block text-sm text-text-secondary">
             Type
             <select
-              className="mt-1.5 w-full rounded-[var(--radius-sm)] border border-accent bg-bg-deepest px-3 py-2"
+              className="field-input field-select mt-1.5"
               value={entryForm.type}
               onChange={(e) => setEntryForm({ ...entryForm, type: e.target.value })}
             >

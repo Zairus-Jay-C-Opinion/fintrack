@@ -6,16 +6,16 @@ export default function CustomRangeSlider({ value, min = 0, max = 100, onChange 
   return (
     <div className="relative h-7 w-full">
       <div
-        className="pointer-events-none absolute left-0 right-0 top-1/2 h-2 -translate-y-1/2 rounded-full border border-[#4a5c6a] bg-[#253745]"
+        className="pointer-events-none absolute left-0 right-0 top-1/2 h-2 -translate-y-1/2 rounded-full border border-[#213631] bg-[#1c2e29]"
         aria-hidden
       >
         <div
-          className="h-full rounded-full bg-[#5b8fa8]"
+          className="h-full rounded-full bg-[#10b981]"
           style={{ width: `${pct}%` }}
         />
       </div>
       <div
-        className="pointer-events-none absolute top-1/2 z-[1] h-5 w-5 -translate-y-1/2 rounded-full border-2 border-white bg-[#5b8fa8] shadow-md"
+        className="pointer-events-none absolute top-1/2 z-[1] h-5 w-5 -translate-y-1/2 rounded-full border-2 border-white bg-[#10b981] shadow-md shadow-[0_0_10px_rgba(16,185,129,0.5)]"
         style={{ left: `calc(${pct}% - 10px)` }}
         aria-hidden
       />

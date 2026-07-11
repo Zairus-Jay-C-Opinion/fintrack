@@ -62,13 +62,13 @@ export default function Modal({ open, onClose, title, children }) {
         >
           <button
             type="button"
-            className="absolute inset-0 bg-black/75"
+            className="absolute inset-0 bg-bg-deepest/80 backdrop-blur-sm"
             onClick={onClose}
             aria-label="Close dialog"
           />
           <motion.div
             ref={panelRef}
-            className="relative z-10 flex w-[calc(100vw-1rem)] max-w-md flex-col overflow-hidden rounded-t-2xl border border-accent bg-bg-mid shadow-elevated md:w-full md:rounded-2xl"
+            className="relative z-10 flex w-[calc(100vw-1rem)] max-w-md flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-bg-dark/95 shadow-elevated backdrop-blur-xl md:w-full md:rounded-3xl"
             style={{ height: "min(90dvh, 100%)" }}
             initial={{ opacity: 0, y: "100%" }}
             animate={{ opacity: 1, y: 0 }}
@@ -76,7 +76,7 @@ export default function Modal({ open, onClose, title, children }) {
             transition={{ type: "tween", duration: 0.22 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex shrink-0 items-center justify-between border-b border-accent/60 px-4 py-3">
+            <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
               <h2
                 id="modal-title"
                 className="min-w-0 flex-1 pr-2 font-display text-lg font-bold text-white"
@@ -86,10 +86,10 @@ export default function Modal({ open, onClose, title, children }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="shrink-0 rounded-lg p-2 text-text-secondary hover:bg-bg-deepest hover:text-white"
+                className="shrink-0 rounded-full bg-white/5 p-2 text-text-secondary hover:bg-white/10 hover:text-white"
                 aria-label="Close"
               >
-                <X size={22} />
+                <X size={20} />
               </button>
             </div>
 

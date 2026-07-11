@@ -4,9 +4,9 @@ import { formatPercent } from "../../utils/formatters";
 
 export default function AllocationCard({ allocation, amounts }) {
   const items = [
-    { key: "investments", label: "Investments", color: "#5B8FA8" },
-    { key: "savings", label: "Savings", color: "#4CAF7D" },
-    { key: "spending", label: "Spending", color: "#D4A843" },
+    { key: "investments", label: "Investments", color: "#10B981" },
+    { key: "savings", label: "Savings", color: "#84CC16" },
+    { key: "spending", label: "Spending", color: "#FBBF24" },
   ];
 
   return (

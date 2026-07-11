@@ -1,7 +1,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { chartTheme } from "../../constants/chartTheme";
 
-const COLORS = ["#5B8FA8", "#4CAF7D", "#D4A843"];
+const COLORS = ["#10B981", "#84CC16", "#FBBF24"];
 
 export default function AllocationDonut({ allocation, size = 160 }) {
   const data = [

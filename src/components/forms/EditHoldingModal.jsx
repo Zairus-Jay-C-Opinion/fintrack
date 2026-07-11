@@ -77,7 +77,7 @@ export default function EditHoldingModal({
               {tickerPurchases.map((p) => (
                 <li
                   key={p.id}
-                  className="flex items-center justify-between gap-2 rounded-[var(--radius-sm)] border border-accent bg-bg-deepest px-3 py-2 text-sm"
+                  className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm"
                 >
                   <div className="min-w-0">
                     <span className="text-white">{formatDate(p.date)}</span>

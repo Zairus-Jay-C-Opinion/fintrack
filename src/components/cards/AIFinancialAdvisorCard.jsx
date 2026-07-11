@@ -120,19 +120,20 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
   };
 
   return (
-    <div className="card col-span-full border-t-4 border-t-gain bg-gradient-to-br from-bg-deepest to-bg-deep shadow-lg">
-      <div className="flex items-center gap-2 mb-4 text-gain">
+    <div className="card col-span-full relative overflow-hidden border-t-2 border-t-gain/60 bg-gradient-to-br from-gain/[0.06] to-transparent shadow-lg">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gain/10 blur-3xl" />
+      <div className="relative flex items-center gap-2 mb-4 text-gain">
         <Sparkles size={24} className="animate-pulse" />
         <h3 className="font-display text-xl font-bold text-white">AI Financial Advisor</h3>
       </div>
-      <p className="text-sm text-text-secondary mb-6">
+      <p className="relative text-sm text-text-secondary mb-6">
         Ask me anything about your finances. I will analyze your current net worth, income, and allocation to give you personalized advice.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="relative flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <textarea
-            className="w-full rounded-[var(--radius-md)] border border-accent bg-bg-deep px-4 py-3 text-sm text-gray-800 placeholder:text-gray-500 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-text-secondary/60 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
             placeholder="E.g., How can I optimize my savings?"
             rows={1}
             value={prompt}
@@ -170,7 +171,7 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
       )}
 
       {response && (
-        <div className="mt-6 p-5 rounded-[var(--radius-md)] bg-bg-deep/50 border border-accent text-sm text-text-primary leading-relaxed shadow-inner">
+        <div className="relative mt-6 p-5 rounded-2xl bg-white/[0.03] border border-white/10 text-sm text-text-primary leading-relaxed shadow-inner">
           <div dangerouslySetInnerHTML={formatMarkdown(response)} />
         </div>
       )}

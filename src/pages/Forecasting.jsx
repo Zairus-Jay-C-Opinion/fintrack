@@ -127,7 +127,7 @@ export default function Forecasting() {
           value={goalTarget}
           onChange={(e) => setGoalTarget(parseFloat(e.target.value) || 0)}
         />
-        <div className="card flex flex-col justify-center">
+        <div className="card flex flex-col justify-center border-gain/20 bg-gradient-to-br from-gain/10 to-transparent">
           <p className="text-sm text-text-secondary">Time to reach goal</p>
           <p className="font-mono text-xl text-white">
             {monthsToGoal != null
@@ -160,7 +160,7 @@ export default function Forecasting() {
             {projectionSeries.map((p) => (
               <div
                 key={p.months}
-                className="rounded-[var(--radius-md)] border border-accent bg-bg-deepest px-4 py-2"
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2"
               >
                 <span className="text-xs text-text-secondary">{p.label}</span>
                 <p className="font-mono text-white">{formatPhp(p.valuePhp)}</p>
@@ -196,9 +196,9 @@ export default function Forecasting() {
             <ProjectionLineChart
               data={scenarioData}
               lines={[
-                { dataKey: "base", name: "Current", color: "#5B8FA8" },
-                { dataKey: "moderate", name: "Moderate", color: "#D4A843" },
-                { dataKey: "aggressive", name: "Higher", color: "#4CAF7D" },
+                { dataKey: "base", name: "Current", color: "#10B981" },
+                { dataKey: "moderate", name: "Moderate", color: "#FBBF24" },
+                { dataKey: "aggressive", name: "Higher", color: "#84CC16" },
               ]}
             />
           </div>
@@ -236,31 +236,33 @@ export default function Forecasting() {
         <p className="mt-1 text-sm text-text-secondary">
           First 15 years of the {horizonLabel} projection
         </p>
-        <table className="mt-4 w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-accent text-text-secondary">
-              <th className="pb-2 pr-4">Year</th>
-              <th className="pb-2 pr-4">Portfolio (PHP)</th>
-              <th className="pb-2">Contributed (USD est.)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {yearlyBreakdown.slice(0, 15).map((row) => (
-              <tr key={row.year} className="border-b border-accent/50">
-                <td className="py-2 pr-4">Year {row.year}</td>
-                <td className="py-2 pr-4 font-mono text-gain">
-                  {formatPhp(row.valuePhp)}
-                </td>
-                <td className="py-2 font-mono text-text-secondary">
-                  $
-                  {row.contributed.toLocaleString("en-US", {
-                    maximumFractionDigits: 0,
-                  })}
-                </td>
+        <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-white/10 bg-white/5 text-text-secondary">
+                <th className="px-4 py-3">Year</th>
+                <th className="px-4 py-3">Portfolio (PHP)</th>
+                <th className="px-4 py-3">Contributed (USD est.)</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {yearlyBreakdown.slice(0, 15).map((row) => (
+                <tr key={row.year} className="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
+                  <td className="px-4 py-3">Year {row.year}</td>
+                  <td className="px-4 py-3 font-mono text-gain">
+                    {formatPhp(row.valuePhp)}
+                  </td>
+                  <td className="px-4 py-3 font-mono text-text-secondary">
+                    $
+                    {row.contributed.toLocaleString("en-US", {
+                      maximumFractionDigits: 0,
+                    })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

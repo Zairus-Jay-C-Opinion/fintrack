@@ -5,9 +5,16 @@ import Button from "../ui/Button";
 export default function GoalCard({ goal, onDelete, onUpdateProgress }) {
   const progress =
     goal.target > 0 ? Math.min(100, (goal.current / goal.target) * 100) : 0;
+  const isComplete = progress >= 100;
 
   return (
-    <div className="rounded-[var(--radius-md)] border border-accent bg-bg-deepest p-4">
+    <div
+      className={`rounded-2xl border p-4 backdrop-blur-sm transition-colors ${
+        isComplete
+          ? "border-highlight/40 bg-highlight/5 shadow-[0_0_18px_rgba(16,185,129,0.15)]"
+          : "border-white/10 bg-white/[0.03]"
+      }`}
+    >
       <div className="flex items-start justify-between gap-2">
         <div>
           <h4 className="font-medium text-white">{goal.name}</h4>
@@ -25,9 +32,9 @@ export default function GoalCard({ goal, onDelete, onUpdateProgress }) {
           </button>
         )}
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-bg-mid">
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
         <div
-          className="h-full rounded-full bg-highlight transition-all"
+          className={`h-full rounded-full transition-all ${isComplete ? "bg-highlight" : "bg-gain"}`}
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -35,7 +42,9 @@ export default function GoalCard({ goal, onDelete, onUpdateProgress }) {
         <span className="text-text-primary">
           {formatPhp(goal.current)} / {formatPhp(goal.target)}
         </span>
-        <span className="text-highlight">{progress.toFixed(0)}%</span>
+        <span className={isComplete ? "text-highlight" : "text-gain"}>
+          {progress.toFixed(0)}%
+        </span>
       </div>
       {onUpdateProgress && (
         <Button

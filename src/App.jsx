@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Sidebar from "./components/layout/Sidebar";
-import MobileNav from "./components/layout/MobileNav";
+import FloatingNav from "./components/layout/FloatingNav";
 import PageWrapper from "./components/layout/PageWrapper";
 import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
@@ -23,13 +21,19 @@ import WalkthroughOverlay from "./components/ui/WalkthroughOverlay";
 function AppRoutes() {
   useNotifications();
   useMarketDataSync();
-  const [sidebarCollapsed] = useState(false);
 
   return (
     <MarketChartProvider>
-      <div className="flex h-[100dvh] max-h-[100dvh] w-full max-w-full overflow-hidden bg-bg-deepest pt-[env(safe-area-inset-top)] pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:h-full md:max-h-none md:pb-0 md:pt-0">
-        <Sidebar collapsed={sidebarCollapsed} />
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div
+        className="fixed inset-0 z-0 overflow-hidden bg-bg-deepest"
+        aria-hidden="true"
+      >
+        <div className="ambient-orb-1" />
+        <div className="ambient-orb-2" />
+        <div className="ambient-noise" />
+      </div>
+      <div className="relative z-10 flex h-[100dvh] max-h-[100dvh] w-full max-w-full flex-col overflow-hidden pt-[env(safe-area-inset-top)]">
+        <main className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden">
           <PageWrapper>
             <Routes>
               <Route path="/" element={<Dashboard />} />
@@ -44,8 +48,8 @@ function AppRoutes() {
             </Routes>
           </PageWrapper>
         </main>
-        <MobileNav />
       </div>
+      <FloatingNav />
       {/* Walkthrough system — renders via portals above everything */}
       <WelcomeModal />
       <SetupModal />

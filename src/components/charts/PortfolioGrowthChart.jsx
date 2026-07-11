@@ -1,6 +1,6 @@
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -25,26 +25,33 @@ export default function PortfolioGrowthChart({ data }) {
         Portfolio Performance
       </h3>
       <ResponsiveContainer width="100%" height={220}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.gridColor} />
+        <AreaChart data={data}>
+          <defs>
+            <linearGradient id="portfolioGrowthFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={chartTheme.primary} stopOpacity={0.35} />
+              <stop offset="95%" stopColor={chartTheme.primary} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.gridColor} vertical={false} />
           <XAxis dataKey="label" stroke={chartTheme.axisColor} tick={{ fill: chartTheme.textColor, fontSize: 12 }} />
           <YAxis stroke={chartTheme.axisColor} tick={{ fill: chartTheme.textColor, fontSize: 12 }} />
           <Tooltip
             contentStyle={{
               background: chartTheme.tooltipBg,
               border: `1px solid ${chartTheme.tooltipBorder}`,
+              borderRadius: 16,
             }}
             formatter={(v) => formatPhp(v)}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="value"
             stroke={chartTheme.primary}
-            strokeWidth={2}
-            dot={{ fill: chartTheme.primary, r: 4 }}
+            strokeWidth={3}
+            fill="url(#portfolioGrowthFill)"
             animationDuration={800}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import TopBar from "../components/layout/TopBar";
 import PageHelp from "../components/ui/PageHelp";
-import StatCard from "../components/cards/StatCard";
+import { Activity, ShieldCheck, HeartPulse } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -81,6 +81,12 @@ export default function Analytics() {
     return points;
   }, [purchases, savingsEntries, netWorth]);
 
+  let healthStatus = { label: "Needs Attention", color: "text-loss", stroke: "stroke-loss", icon: Activity };
+  if (healthScore > 80) healthStatus = { label: "Excellent", color: "text-highlight", stroke: "stroke-highlight", icon: ShieldCheck };
+  else if (healthScore > 60) healthStatus = { label: "Good", color: "text-gain", stroke: "stroke-gain", icon: HeartPulse };
+  const HealthIcon = healthStatus.icon;
+  const circumference = 2 * Math.PI * 56;
+
   return (
     <>
       <TopBar
@@ -96,21 +102,53 @@ export default function Analytics() {
         </p>
       </PageHelp>
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Financial Health"
-          value={`${healthScore}/100`}
-          sub={healthScore >= 80 ? "On track" : "Room to improve"}
-        />
-        <StatCard
-          label="Target savings rate"
-          value={formatPercent(allocation.savings)}
-        />
-        <StatCard
-          label="Target investment rate"
-          value={formatPercent(allocation.investments)}
-        />
-        <StatCard label="Current net worth" value={formatPhp(netWorth)} />
+      <div className="card relative mb-6 overflow-hidden">
+        <div className="pointer-events-none absolute right-0 top-0 p-8 opacity-10">
+          <HealthIcon className="h-32 w-32" />
+        </div>
+        <div className="relative flex flex-col items-center gap-8 md:flex-row">
+          <div className="relative flex h-32 w-32 shrink-0 items-center justify-center">
+            <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 128 128">
+              <circle cx="64" cy="64" r="56" className="stroke-white/10" strokeWidth="8" fill="none" />
+              <circle
+                cx="64"
+                cy="64"
+                r="56"
+                className={healthStatus.stroke}
+                strokeWidth="8"
+                fill="none"
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference - (circumference * healthScore) / 100}
+                strokeLinecap="round"
+                style={{ transition: "stroke-dashoffset 0.6s ease" }}
+              />
+            </svg>
+            <div className="absolute flex flex-col items-center justify-center text-center">
+              <span className="font-mono text-3xl font-bold text-white">{healthScore}</span>
+            </div>
+          </div>
+
+          <div className="flex-1 text-center md:text-left">
+            <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-text-secondary">
+              Overall Health Score
+            </p>
+            <h2 className={`mb-4 text-2xl font-bold ${healthStatus.color}`}>{healthStatus.label}</h2>
+            <div className="flex flex-wrap justify-center gap-3 md:justify-start">
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2">
+                <span className="block text-xs text-text-secondary">Target Savings Rate</span>
+                <span className="font-mono text-white">{formatPercent(allocation.savings)}</span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2">
+                <span className="block text-xs text-text-secondary">Target Investment Rate</span>
+                <span className="font-mono text-white">{formatPercent(allocation.investments)}</span>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-2">
+                <span className="block text-xs text-text-secondary">Current Net Worth</span>
+                <span className="font-mono text-white">{formatPhp(netWorth)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
@@ -158,7 +196,7 @@ export default function Analytics() {
             { label: "Savings", target: allocAmounts.savings, pct: allocation.savings },
             { label: "Spending", target: allocAmounts.spending, pct: allocation.spending },
           ].map((row) => (
-            <li key={row.label} className="flex items-center justify-between border-b border-accent/50 pb-2">
+            <li key={row.label} className="flex items-center justify-between border-b border-white/5 pb-2">
               <span>{row.label}</span>
               <span className="font-mono text-white">
                 {formatPhp(row.target)} ({formatPercent(row.pct)})
