@@ -11,31 +11,33 @@ export default function AllocationDonut({ allocation, size = 160 }) {
   ];
 
   return (
-    <ResponsiveContainer width={size} height={size}>
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={50}
-          outerRadius={70}
-          paddingAngle={2}
-          dataKey="value"
-        >
-          {data.map((_, i) => (
-            <Cell key={i} fill={COLORS[i]} stroke="transparent" />
-          ))}
-        </Pie>
-        <Tooltip
-          contentStyle={{
-            background: chartTheme.tooltipBg,
-            border: `1px solid ${chartTheme.tooltipBorder}`,
-            borderRadius: 8,
-            color: chartTheme.textColor,
-          }}
-          formatter={(v) => [`${v.toFixed(1)}%`, ""]}
-        />
-      </PieChart>
-    </ResponsiveContainer>
+    <div className="w-full" style={{ maxWidth: size, aspectRatio: "1 / 1" }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius="55%"
+            outerRadius="80%"
+            paddingAngle={2}
+            dataKey="value"
+          >
+            {data.map((_, i) => (
+              <Cell key={i} fill={COLORS[i]} stroke="transparent" />
+            ))}
+          </Pie>
+          <Tooltip
+            contentStyle={{
+              background: chartTheme.tooltipBg,
+              border: `1px solid ${chartTheme.tooltipBorder}`,
+              borderRadius: 8,
+              color: chartTheme.textColor,
+            }}
+            formatter={(v) => [`${v.toFixed(1)}%`, ""]}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

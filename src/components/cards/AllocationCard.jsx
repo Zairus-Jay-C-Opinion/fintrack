@@ -14,9 +14,9 @@ export default function AllocationCard({ allocation, amounts }) {
       <h3 className="font-display text-lg font-semibold text-white">
         Monthly Allocation
       </h3>
-      <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
+      <div className="mt-4 flex flex-col items-center gap-6">
         <AllocationDonut allocation={allocation} />
-        <ul className="w-full flex-1 space-y-3">
+        <ul className="w-full space-y-3">
           {items.map(({ key, label, color }) => (
             <li key={key} className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">

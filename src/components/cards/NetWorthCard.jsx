@@ -5,7 +5,7 @@ export default function NetWorthCard({ netWorth, breakdown, action }) {
   return (
     <div className="card-elevated relative overflow-hidden">
       <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-highlight/10 blur-3xl" />
-      {action && <div className="absolute right-6 top-6">{action}</div>}
+      {action && <div className="absolute right-6 top-6 z-10">{action}</div>}
       <p className="relative text-sm text-text-secondary">Total Net Worth</p>
       <motion.p
         key={netWorth}
