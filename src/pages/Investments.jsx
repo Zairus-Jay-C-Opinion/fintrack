@@ -135,6 +135,20 @@ export default function Investments() {
         </ul>
       </PageHelp>
 
+      <div className="card mb-4 border-highlight/20 bg-gradient-to-br from-highlight/10 to-transparent">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 className="font-display font-semibold text-white">DCA Tracker</h3>
+            <p className="mt-2 text-sm text-text-secondary">
+              Next contribution in {daysUntil(nextPayday) ?? "—"} days
+            </p>
+          </div>
+          <p className="font-mono text-2xl text-highlight">
+            {formatPhp(dcaAmount)} recommended
+          </p>
+        </div>
+      </div>
+
       {lastRefresh && (
         <p className="mb-4 text-xs text-text-secondary">
           Market data last updated {lastRefresh.toLocaleString()}
@@ -245,16 +259,6 @@ export default function Investments() {
         </div>
 
         <div className="space-y-4 min-w-0">
-
-          <div className="card border-highlight/20 bg-gradient-to-br from-highlight/10 to-transparent">
-            <h3 className="font-display font-semibold text-white">DCA Tracker</h3>
-            <p className="mt-2 text-sm text-text-secondary">
-              Next contribution in {daysUntil(nextPayday) ?? "—"} days
-            </p>
-            <p className="mt-2 font-mono text-lg text-highlight">
-              {formatPhp(dcaAmount)} recommended
-            </p>
-          </div>
           <div className="card">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <h3 className="font-display font-semibold text-white">

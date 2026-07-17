@@ -3,6 +3,7 @@ import TopBar from "../components/layout/TopBar";
 import PageHelp from "../components/ui/PageHelp";
 import ProjectionLineChart from "../components/charts/ProjectionLineChart";
 import Input from "../components/ui/Input";
+import FormSelect from "../components/ui/FormSelect";
 import Tabs from "../components/ui/Tabs";
 import { useProjections } from "../hooks/useProjections";
 import { useSettingsStore } from "../store/useSettingsStore";
@@ -29,6 +30,7 @@ export default function Forecasting() {
   const [annualRate, setAnnualRate] = useState(10);
   const [horizon, setHorizon] = useState("360");
   const [goalTarget, setGoalTarget] = useState(1000000);
+  const [breakdownYears, setBreakdownYears] = useState(15);
   const [scenarioB, setScenarioB] = useState(monthlyIncome * 0.5);
   const [scenarioC, setScenarioC] = useState(monthlyIncome * 0.8);
   const [fxRate, setFxRate] = useState(phpUsdRate);
@@ -42,6 +44,16 @@ export default function Forecasting() {
       annualRate: annualRate / 100,
       months: horizonMonths,
     });
+
+  const maxBreakdownYears = yearlyBreakdown.length;
+  const clampedBreakdownYears = Math.min(breakdownYears, maxBreakdownYears);
+  const breakdownYearOptions = [5, 10, 15, 20, 30].filter(
+    (y) => y <= maxBreakdownYears
+  );
+  if (!breakdownYearOptions.includes(maxBreakdownYears)) {
+    breakdownYearOptions.push(maxBreakdownYears);
+    breakdownYearOptions.sort((a, b) => a - b);
+  }
 
   const monthsToGoal = monthsToReachGoal(
     monthlyContrib,
@@ -230,12 +242,28 @@ export default function Forecasting() {
       </div>
 
       <div className="card overflow-x-auto">
-        <h3 className="font-display text-lg font-semibold text-white">
-          Year-by-year breakdown
-        </h3>
-        <p className="mt-1 text-sm text-text-secondary">
-          First 15 years of the {horizonLabel} projection
-        </p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3 className="font-display text-lg font-semibold text-white">
+              Year-by-year breakdown
+            </h3>
+            <p className="mt-1 text-sm text-text-secondary">
+              First {clampedBreakdownYears} years of the {horizonLabel} projection
+            </p>
+          </div>
+          <FormSelect
+            label="Years shown"
+            className="w-auto"
+            value={clampedBreakdownYears}
+            onChange={(e) => setBreakdownYears(parseInt(e.target.value, 10))}
+          >
+            {breakdownYearOptions.map((y) => (
+              <option key={y} value={y}>
+                {y} {y === 1 ? "year" : "years"}
+              </option>
+            ))}
+          </FormSelect>
+        </div>
         <div className="mt-4 overflow-x-auto rounded-2xl border border-white/10">
           <table className="w-full text-left text-sm">
             <thead>
@@ -246,7 +274,7 @@ export default function Forecasting() {
               </tr>
             </thead>
             <tbody>
-              {yearlyBreakdown.slice(0, 15).map((row) => (
+              {yearlyBreakdown.slice(0, clampedBreakdownYears).map((row) => (
                 <tr key={row.year} className="border-b border-white/5 last:border-0 hover:bg-white/[0.03]">
                   <td className="px-4 py-3">Year {row.year}</td>
                   <td className="px-4 py-3 font-mono text-gain">

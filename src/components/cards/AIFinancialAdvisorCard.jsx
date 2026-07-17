@@ -120,20 +120,34 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
   };
 
   return (
-    <div className="card col-span-full relative overflow-hidden border-t-2 border-t-gain/60 bg-gradient-to-br from-gain/[0.06] to-transparent shadow-lg">
+    <div className="card col-span-full relative overflow-hidden border-t-2 border-t-gain/60 bg-gradient-to-br from-gain/[0.06] to-transparent shadow-lg p-3 md:p-6">
       <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gain/10 blur-3xl" />
-      <div className="relative flex items-center gap-2 mb-4 text-gain">
-        <Sparkles size={24} className="animate-pulse" />
-        <h3 className="font-display text-xl font-bold text-white">AI Financial Advisor</h3>
+      <div className="relative flex items-center gap-1.5 mb-2 sm:mb-4 sm:gap-2 text-gain">
+        <Sparkles className="h-5 w-5 animate-pulse sm:h-6 sm:w-6" />
+        <h3 className="font-display text-base font-bold text-white sm:text-xl">AI Financial Advisor</h3>
       </div>
-      <p className="relative text-sm text-text-secondary mb-6">
+      <p className="relative text-xs text-text-secondary mb-3 sm:hidden">
+        Personalized advice based on your finances.
+      </p>
+      <p className="relative hidden text-sm text-text-secondary mb-6 sm:block">
         Ask me anything about your finances. I will analyze your current net worth, income, and allocation to give you personalized advice.
       </p>
 
       <div className="relative flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
+          {(prompt || response) && (
+            <button
+              type="button"
+              onClick={handleClear}
+              disabled={isLoading}
+              aria-label="Clear input and response"
+              className="absolute right-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-loss/10 text-loss transition-colors hover:bg-loss/20 disabled:opacity-50 sm:hidden"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
           <textarea
-            className="w-full max-h-32 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-text-secondary/60 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
+            className="w-full max-h-32 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 px-4 py-3 pr-12 sm:pr-4 text-sm text-white placeholder:text-text-secondary/60 focus:border-highlight focus:outline-none focus:ring-1 focus:ring-highlight resize-none min-h-[50px]"
             placeholder="E.g., How can I optimize my savings?"
             rows={2}
             value={prompt}
@@ -141,15 +155,24 @@ Allocation Strategy: ${allocation?.investments || 0}% Investments, ${
             onKeyDown={handleKeyDown}
             disabled={isLoading}
           />
+          <button
+            type="button"
+            onClick={handleAsk}
+            disabled={isLoading || !prompt.trim()}
+            aria-label={isLoading ? "Thinking" : "Ask AI"}
+            className="absolute bottom-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-gain text-white transition-colors hover:bg-gain/90 disabled:opacity-50 sm:hidden"
+          >
+            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+          </button>
         </div>
-        <div className="flex gap-2 self-end sm:self-auto">
+        <div className="hidden gap-2 self-end sm:flex sm:self-auto">
           <Button
             onClick={handleAsk}
             disabled={isLoading || !prompt.trim()}
             className="h-[50px] px-6 py-0 flex items-center justify-center gap-2 bg-gain hover:bg-gain/90 text-white"
           >
             {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-            <span className="hidden sm:inline">{isLoading ? "Thinking..." : "Ask AI"}</span>
+            <span>{isLoading ? "Thinking..." : "Ask AI"}</span>
           </Button>
           {(prompt || response) && (
             <Button

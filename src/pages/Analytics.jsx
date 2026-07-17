@@ -103,11 +103,11 @@ export default function Analytics() {
       </PageHelp>
 
       <div className="card relative mb-6 overflow-hidden">
-        <div className="pointer-events-none absolute right-0 top-0 p-8 opacity-10">
-          <HealthIcon className="h-32 w-32" />
-        </div>
         <div className="relative flex flex-col items-center gap-8 md:flex-row">
           <div className="relative flex h-32 w-32 shrink-0 items-center justify-center">
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-10">
+              <HealthIcon className="h-20 w-20" />
+            </div>
             <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 128 128">
               <circle cx="64" cy="64" r="56" className="stroke-white/10" strokeWidth="8" fill="none" />
               <circle
