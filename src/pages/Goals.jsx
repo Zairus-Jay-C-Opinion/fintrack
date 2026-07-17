@@ -32,6 +32,9 @@ export default function Goals() {
   const [progressModal, setProgressModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
   const [progressInput, setProgressInput] = useState("");
+  const [dateModal, setDateModal] = useState(false);
+  const [editingDateGoal, setEditingDateGoal] = useState(null);
+  const [dateInput, setDateInput] = useState("");
   const [goalForm, setGoalForm] = useState({
     name: "",
     target: "",
@@ -152,6 +155,11 @@ export default function Goals() {
                 setEditingGoal(goal);
                 setProgressInput(String(goal.current));
                 setProgressModal(true);
+              }}
+              onEditDate={(goal) => {
+                setEditingDateGoal(goal);
+                setDateInput(goal.targetDate);
+                setDateModal(true);
               }}
             />
           ))}
@@ -315,6 +323,39 @@ export default function Goals() {
             step="0.01"
             value={progressInput}
             onChange={(e) => setProgressInput(e.target.value)}
+            required
+          />
+          <Button type="submit" className="mt-2 w-full">
+            Save
+          </Button>
+        </form>
+      </Modal>
+
+      <Modal
+        open={dateModal}
+        onClose={() => {
+          setDateModal(false);
+          setEditingDateGoal(null);
+        }}
+        title={`Edit target date — ${editingDateGoal?.name ?? ""}`}
+      >
+        <form
+          id="goal-date-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (editingDateGoal && dateInput) {
+              updateSavingsGoal(editingDateGoal.id, { targetDate: dateInput });
+              setDateModal(false);
+              setEditingDateGoal(null);
+            }
+          }}
+          className="space-y-4"
+        >
+          <Input
+            label="Target date"
+            type="date"
+            value={dateInput}
+            onChange={(e) => setDateInput(e.target.value)}
             required
           />
           <Button type="submit" className="mt-2 w-full">

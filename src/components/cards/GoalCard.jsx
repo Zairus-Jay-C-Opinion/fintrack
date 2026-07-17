@@ -1,8 +1,9 @@
+import { Pencil } from "lucide-react";
 import { formatPhp } from "../../utils/currency";
 import { formatDate } from "../../utils/formatters";
 import Button from "../ui/Button";
 
-export default function GoalCard({ goal, onDelete, onUpdateProgress }) {
+export default function GoalCard({ goal, onDelete, onUpdateProgress, onEditDate }) {
   const progress =
     goal.target > 0 ? Math.min(100, (goal.current / goal.target) * 100) : 0;
   const isComplete = progress >= 100;
@@ -18,8 +19,18 @@ export default function GoalCard({ goal, onDelete, onUpdateProgress }) {
       <div className="flex items-start justify-between gap-2">
         <div>
           <h4 className="font-medium text-white">{goal.name}</h4>
-          <p className="text-xs text-text-secondary">
+          <p className="flex items-center gap-1.5 text-xs text-text-secondary">
             Target {formatDate(goal.targetDate)}
+            {onEditDate && (
+              <button
+                type="button"
+                onClick={() => onEditDate(goal)}
+                aria-label="Edit target date"
+                className="text-text-secondary/70 hover:text-highlight"
+              >
+                <Pencil size={12} />
+              </button>
+            )}
           </p>
         </div>
         {onDelete && (

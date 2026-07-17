@@ -72,6 +72,26 @@ export default function Dashboard() {
         </p>
       </PageHelp>
 
+      <div className="mb-4 lg:hidden">
+        <NetWorthCard
+          netWorth={netWorth}
+          breakdown={[
+            { label: "Cash", value: formatPhp(cashOnHand) },
+            { label: "Savings", value: formatPhp(savingsBalance) },
+            { label: "Investments", value: formatPhp(investmentPhp) },
+          ]}
+          action={
+            <Link
+              to="/expenses"
+              title="Log expense"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-bg-deepest shadow-lg transition-transform hover:scale-105"
+            >
+              <Plus size={18} />
+            </Link>
+          }
+        />
+      </div>
+
       <div className="mb-4">
         <AIFinancialAdvisorCard
           netWorth={netWorth}
@@ -107,23 +127,25 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-4">
-          <NetWorthCard
-            netWorth={netWorth}
-            breakdown={[
-              { label: "Cash", value: formatPhp(cashOnHand) },
-              { label: "Savings", value: formatPhp(savingsBalance) },
-              { label: "Investments", value: formatPhp(investmentPhp) },
-            ]}
-            action={
-              <Link
-                to="/expenses"
-                title="Log expense"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-bg-deepest shadow-lg transition-transform hover:scale-105"
-              >
-                <Plus size={18} />
-              </Link>
-            }
-          />
+          <div className="hidden lg:block">
+            <NetWorthCard
+              netWorth={netWorth}
+              breakdown={[
+                { label: "Cash", value: formatPhp(cashOnHand) },
+                { label: "Savings", value: formatPhp(savingsBalance) },
+                { label: "Investments", value: formatPhp(investmentPhp) },
+              ]}
+              action={
+                <Link
+                  to="/expenses"
+                  title="Log expense"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-bg-deepest shadow-lg transition-transform hover:scale-105"
+                >
+                  <Plus size={18} />
+                </Link>
+              }
+            />
+          </div>
 
           <div className="card">
             <div className="mb-4 flex items-center justify-between">
